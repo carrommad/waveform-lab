@@ -1305,7 +1305,7 @@ function renderLoop() {
 
   // Clip detection on raw input (pre digital gain); hold ~1 s
   const gainNow = inputGainNode ? inputGainNode.gain.value : 1;
-  if (gainNow > 0 && peak / gainNow >= 0.98) clipHoldFrames = 60;
+  if (gainNow > 0 && peak / gainNow >= 0.85) clipHoldFrames = 60;
   else if (clipHoldFrames > 0) clipHoldFrames--;
   if (clipIndicator) clipIndicator.classList.toggle('active', clipHoldFrames > 0);
 
@@ -1569,11 +1569,40 @@ function initDraggablePanels() {
       titleEl.appendChild(controls);
     }
 
-    panel.setAttribute('draggable', 'true');
+    panel.setAttribute('draggable', 'false');
+
+    // Isolate all interactive elements so dragging them NEVER initiates a panel drag
+    panel.querySelectorAll('input, select, button, label, canvas, .panel-actions').forEach(el => {
+      el.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+        panel.setAttribute('draggable', 'false');
+      });
+      el.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        panel.setAttribute('draggable', 'false');
+      });
+    });
+
+    // Only allow panel dragging when initiated from the drag grip (⠿) or header title
+    panel.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.panel-actions') || e.target.closest('.panel-move-controls') || ['INPUT', 'SELECT', 'CANVAS', 'BUTTON', 'LABEL'].includes(e.target.tagName)) {
+        panel.setAttribute('draggable', 'false');
+        return;
+      }
+      if (e.target.closest('.drag-grip') || e.target.closest('.panel-title')) {
+        panel.setAttribute('draggable', 'true');
+      } else {
+        panel.setAttribute('draggable', 'false');
+      }
+    });
 
     panel.addEventListener('dragstart', (e) => {
-      // Do not initiate drag from interactive controls or buttons
-      if (e.target.closest('.panel-actions') || e.target.closest('.panel-move-controls') || e.target.closest('canvas') || ['INPUT', 'SELECT', 'CANVAS', 'BUTTON'].includes(e.target.tagName)) {
+      // Strictly require initiation from drag grip or title
+      if (!e.target.closest('.drag-grip') && !e.target.closest('.panel-title')) {
+        e.preventDefault();
+        return;
+      }
+      if (e.target.closest('.panel-actions') || e.target.closest('.panel-move-controls') || e.target.closest('canvas') || ['INPUT', 'SELECT', 'CANVAS', 'BUTTON', 'LABEL'].includes(e.target.tagName)) {
         e.preventDefault();
         return;
       }
@@ -1588,9 +1617,11 @@ function initDraggablePanels() {
     });
 
     panel.addEventListener('dragend', () => {
+      panel.setAttribute('draggable', 'false');
       chartsLayout.querySelectorAll('.chart-panel').forEach(p => {
         p.classList.remove('panel-dragging');
         p.classList.remove('panel-drag-over');
+        p.setAttribute('draggable', 'false');
       });
       draggedPanel = null;
       resizeCanvases();
