@@ -333,9 +333,10 @@ async function startAudio() {
     analyserRight.fftSize = 2048;
     analyserRight.smoothingTimeConstant = 0.5;
 
-    // Fine analyser (8192 ≈ 5.9 Hz/bin): pitch, harmonics, chromagram
+    // Ultra-Fine analyser (32768 ≈ 1.46 Hz/bin at 48 kHz - maximum Web Audio API resolution)
+    // Powers surgical FFT spectrum, high-density Spectrogram, pitch, harmonics & chromagram
     analyserFine = audioCtx.createAnalyser();
-    analyserFine.fftSize = 8192;
+    analyserFine.fftSize = 32768;
     analyserFine.smoothingTimeConstant = 0.5;
 
     splitterNode.connect(analyserLeft, 0);
@@ -628,26 +629,64 @@ function renderFFT(dataFreqL, w, h, sampleRate) {
   fftCtx.shadowColor = '#00f0ff';
   fftCtx.shadowBlur = 6;
 
-  for (let i = 0; i < binCount; i++) {
-    const db = dataFreqL[i];
-    if (db > maxVal && i > 1) {
-      maxVal = db;
-      maxBin = i;
-    }
+  const pxWidth = Math.min(Math.floor(w), 1200);
+  if (binCount > pxWidth * 2) {
+    // Ultra-high-resolution peak-hold bin decimation across display pixels
+    const minLog = Math.log10(20);
+    const maxLog = Math.log10(nyquist);
+    const logSpan = maxLog - minLog;
 
-    const y = Math.max(0, Math.min(h, h - ((db + 100) / 100) * h));
-    let x = 0;
-    if (isLog) {
-      const minLog = Math.log10(20);
-      const maxLog = Math.log10(nyquist);
-      const currentLog = Math.log10(Math.max(20, (i * nyquist) / binCount));
-      x = ((currentLog - minLog) / (maxLog - minLog)) * w;
-    } else {
-      x = (i / binCount) * w;
-    }
+    for (let px = 0; px < pxWidth; px++) {
+      let b0 = 0;
+      let b1 = 0;
+      if (isLog) {
+        const f0 = Math.pow(10, minLog + (px / pxWidth) * logSpan);
+        const f1 = Math.pow(10, minLog + ((px + 1) / pxWidth) * logSpan);
+        b0 = Math.max(0, Math.floor((f0 / nyquist) * binCount));
+        b1 = Math.min(binCount - 1, Math.ceil((f1 / nyquist) * binCount));
+      } else {
+        b0 = Math.floor((px / pxWidth) * binCount);
+        b1 = Math.min(binCount - 1, Math.floor(((px + 1) / pxWidth) * binCount));
+      }
+      if (b1 < b0) b1 = b0;
 
-    if (i === 0) fftCtx.moveTo(x, y);
-    else fftCtx.lineTo(x, y);
+      let peakDb = -120;
+      for (let b = b0; b <= b1; b++) {
+        const db = dataFreqL[b];
+        if (db > peakDb) peakDb = db;
+        if (db > maxVal && b > 1) {
+          maxVal = db;
+          maxBin = b;
+        }
+      }
+
+      const y = Math.max(0, Math.min(h, h - ((peakDb + 100) / 100) * h));
+      const x = (px / pxWidth) * w;
+      if (px === 0) fftCtx.moveTo(x, y);
+      else fftCtx.lineTo(x, y);
+    }
+  } else {
+    for (let i = 0; i < binCount; i++) {
+      const db = dataFreqL[i];
+      if (db > maxVal && i > 1) {
+        maxVal = db;
+        maxBin = i;
+      }
+
+      const y = Math.max(0, Math.min(h, h - ((db + 100) / 100) * h));
+      let x = 0;
+      if (isLog) {
+        const minLog = Math.log10(20);
+        const maxLog = Math.log10(nyquist);
+        const currentLog = Math.log10(Math.max(20, (i * nyquist) / binCount));
+        x = ((currentLog - minLog) / (maxLog - minLog)) * w;
+      } else {
+        x = (i / binCount) * w;
+      }
+
+      if (i === 0) fftCtx.moveTo(x, y);
+      else fftCtx.lineTo(x, y);
+    }
   }
   fftCtx.stroke();
   fftCtx.shadowBlur = 0;
@@ -984,14 +1023,15 @@ function renderHarmonics(dataFreqL, fundFreq, sampleRate, w, h) {
   }
 }
 
-// 5. Spectrogram Waterfall Heatmap (Auto-Scaled 0 to 1)
+// 5. Spectrogram Waterfall Heatmap (Auto-Scaled 0 to 1 with High-Density Interpolation)
 function renderSpectrogram(dataFreqL, w, h, sampleRate) {
-  // Shift existing canvas down by 2px
-  specCtx.drawImage(spectrogramCanvas, 0, 0, w, h - 2, 0, 2, w, h - 2);
+  // Shift existing canvas down by 2px (above bottom axis bar)
+  specCtx.drawImage(spectrogramCanvas, 0, 0, w, h - 20, 0, 2, w, h - 20);
 
   const nyquist = (sampleRate || 48000) / 2;
   const binCount = dataFreqL.length;
-  const outBins = 160;
+  // High-density sampling: smooth 1:1 or 2:1 column interpolation across screen width
+  const outBins = Math.min(Math.floor(w), 800);
   const sliceW = w / outBins;
   const mode = specScale ? specScale.value : 'mel';
 
@@ -1014,8 +1054,12 @@ function renderSpectrogram(dataFreqL, w, h, sampleRate) {
       hz = minHz + fraction * (maxHz - minHz);
     }
 
-    const bin = Math.min(binCount - 1, Math.max(0, Math.round((hz / nyquist) * binCount)));
-    const db = dataFreqL[bin];
+    // Surgical fractional bin interpolation from high-resolution FFT buffer
+    const binFloat = (hz / nyquist) * binCount;
+    const b0 = Math.max(0, Math.min(binCount - 1, Math.floor(binFloat)));
+    const b1 = Math.min(binCount - 1, b0 + 1);
+    const t = binFloat - b0;
+    const db = dataFreqL[b0] * (1 - t) + dataFreqL[b1] * t;
 
     // Normalized strictly from 0 (noise floor) to 1 (peak harmonic)
     const norm = Math.max(0, Math.min(1, (db - dynamicFloorDb) / (dynamicPeakDb - dynamicFloorDb)));
@@ -1127,7 +1171,7 @@ function renderChromagram(dataFreqL, sampleRate, w, h) {
   }
 }
 
-// 7. Stereo Phase Scope (Goniometer with dynamic auto-expansion)
+// 7. Stereo Phase Scope (Goniometer with dynamic auto-expansion & mono collapse)
 let phasePeakSmooth = 0.05;
 
 function renderPhaseScope(dataTimeL, dataTimeR, w, h) {
@@ -1141,13 +1185,15 @@ function renderPhaseScope(dataTimeL, dataTimeR, w, h) {
   const len = Math.min(dataTimeL.length, dataTimeR.length);
 
   // Compute peak magnitude in recent window for dynamic scaling
-  let peakMag = 0.001;
+  let peakMagL = 0.001;
+  let peakMagR = 0.001;
   for (let i = 0; i < len; i += 4) {
     const l = Math.abs(dataTimeL[i]);
     const r = Math.abs(dataTimeR[i]);
-    if (l > peakMag) peakMag = l;
-    if (r > peakMag) peakMag = r;
+    if (l > peakMagL) peakMagL = l;
+    if (r > peakMagR) peakMagR = r;
   }
+  const peakMag = Math.max(peakMagL, peakMagR);
 
   // Smooth attack / slow decay
   if (peakMag > phasePeakSmooth) {
@@ -1155,6 +1201,10 @@ function renderPhaseScope(dataTimeL, dataTimeR, w, h) {
   } else {
     phasePeakSmooth = phasePeakSmooth * 0.96 + peakMag * 0.04;
   }
+
+  // Detect single-channel mono input (e.g. TS jack plugged into TRS line-in where Right is silent, or vice versa)
+  const isMonoL = peakMagL > 0.004 && peakMagR < 0.0015;
+  const isMonoR = peakMagR > 0.004 && peakMagL < 0.0015;
 
   // Auto-gain multiplier (fill ~80% of reticle, clamped to avoid blowing up silence)
   const normFloor = 0.02; // ~ -34 dB minimum reference
@@ -1168,8 +1218,11 @@ function renderPhaseScope(dataTimeL, dataTimeR, w, h) {
   phaseCtx.beginPath();
 
   for (let i = 0; i < len; i += 2) {
-    const l = dataTimeL[i];
-    const r = dataTimeR[i];
+    let l = dataTimeL[i];
+    let r = dataTimeR[i];
+    if (isMonoL) r = l;
+    else if (isMonoR) l = r;
+
     const x = cx + ((l - r) * 0.707) * scale;
     const y = cy - ((l + r) * 0.707) * scale;
     if (i === 0) phaseCtx.moveTo(x, y);
@@ -1186,6 +1239,13 @@ function renderPhaseScope(dataTimeL, dataTimeR, w, h) {
   phaseCtx.moveTo(cx - targetRadius, cy); phaseCtx.lineTo(cx + targetRadius, cy);
   phaseCtx.moveTo(cx, cy - targetRadius); phaseCtx.lineTo(cx, cy + targetRadius);
   phaseCtx.stroke();
+
+  if (isMonoL || isMonoR) {
+    phaseCtx.fillStyle = 'rgba(187, 134, 252, 0.85)';
+    phaseCtx.font = '10px JetBrains Mono, monospace';
+    phaseCtx.textAlign = 'center';
+    phaseCtx.fillText('MONO (AUTO-COLLAPSED)', cx, cy + targetRadius + 14);
+  }
 }
 
 // Main Render Loop
@@ -1322,7 +1382,7 @@ function renderLoop() {
       detectedFreq = lastDetectedFreq;
     } else if (dynamicPeakDb > -60.0) {
       // Fallback spectral peak for complex synth waveforms when autocorrelation misses
-      const specFund = getSpectralFundamental(dataFreqL, audioCtx.sampleRate / 2);
+      const specFund = getSpectralFundamental(fineFreq, audioCtx.sampleRate / 2);
       if (specFund > 20) {
         detectedFreq = specFund;
         lastDetectedFreq = specFund;
@@ -1343,17 +1403,17 @@ function renderLoop() {
     freqReadout.textContent = '-- Hz';
   }
 
-  // Update dynamic range AGC for spectrogram auto-scaling
-  updateDynamicRange(dataFreqL, audioCtx.sampleRate / 2);
+  // Update dynamic range AGC for spectrogram auto-scaling using fine resolution
+  updateDynamicRange(fineFreq, audioCtx.sampleRate / 2);
 
   const activeFreq = detectedFreq > 20 ? detectedFreq : 0;
 
   // Draw 6 comprehensive synth graphs
   renderOscilloscope(dataTimeL, oscCanvas.width, oscCanvas.height, activeFreq, audioCtx.sampleRate);
-  renderFFT(dataFreqL, fftCanvas.width, fftCanvas.height, audioCtx.sampleRate);
+  renderFFT(fineFreq, fftCanvas.width, fftCanvas.height, audioCtx.sampleRate, activeFreq);
   render3DWaterfall(dataFreqL, waterfallCanvas.width, waterfallCanvas.height, audioCtx.sampleRate);
   renderHarmonics(fineFreq, activeFreq, audioCtx.sampleRate, harmonicsCanvas.width, harmonicsCanvas.height);
-  renderSpectrogram(dataFreqL, spectrogramCanvas.width, spectrogramCanvas.height, audioCtx.sampleRate);
+  renderSpectrogram(fineFreq, spectrogramCanvas.width, spectrogramCanvas.height, audioCtx.sampleRate);
   renderChromagram(fineFreq, audioCtx.sampleRate, chromaCanvas.width, chromaCanvas.height);
   renderPhaseScope(dataTimeL, dataTimeR, phaseCanvas.width, phaseCanvas.height);
 }
