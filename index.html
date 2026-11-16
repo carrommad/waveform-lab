@@ -82,6 +82,17 @@
         </div>
       </div>
 
+      <div class="control-card" id="midiLogsToggleCard" style="display: none;">
+        <label for="midiLogsToggle">MIDI Logs</label>
+        <div class="monitor-inner">
+          <label class="switch" title="Toggle visibility of the 3-device live MIDI telemetry logs">
+            <input type="checkbox" id="midiLogsToggle" role="switch" checked>
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span id="midiLogsState" class="switch-text">Show</span>
+          </label>
+        </div>
+      </div>
+
       <div class="button-card-group">
         <button id="freezeBtn" class="btn secondary" disabled>Freeze View</button>
         <button id="toggleAudioBtn" class="btn primary">Start Audio</button>
@@ -328,6 +339,6 @@
     <p>Tip: Connect Roland S-1 via USB-C (audio class compliant) or audio line-in. Adjust input level on device to avoid clipping.</p>
   </footer>
 
-  <script src="app.js?v=28"></script>
+  <script src="app.js?v=29"></script>
 </body>
 </html>

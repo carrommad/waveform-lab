@@ -1522,6 +1522,10 @@ function initMidiTelemetry() {
     }
   }
 
+  const headerToggleCard = document.getElementById("midiLogsToggleCard");
+  const headerToggle = document.getElementById("midiLogsToggle");
+  const headerToggleState = document.getElementById("midiLogsState");
+
   // Probe server state endpoint
   fetch("/api/midi/state", { cache: "no-store" })
     .then(res => {
@@ -1531,8 +1535,29 @@ function initMidiTelemetry() {
     .then(data => {
       if (!data || !data.online) return;
 
-      // Reveal telemetry section
-      section.style.display = "flex";
+      // Reveal header toggle switch on host/VPN
+      if (headerToggleCard) headerToggleCard.style.display = "flex";
+
+      const savedVisible = localStorage.getItem("waveform_show_midi_logs");
+      let isMidiVisible = savedVisible !== "false";
+
+      function setMidiVisibility(visible) {
+        isMidiVisible = visible;
+        section.style.display = visible ? "flex" : "none";
+        if (headerToggle) headerToggle.checked = visible;
+        if (headerToggleState) headerToggleState.textContent = visible ? "Show" : "Hide";
+        try {
+          localStorage.setItem("waveform_show_midi_logs", String(visible));
+        } catch (_) {}
+      }
+
+      if (headerToggle) {
+        headerToggle.addEventListener("change", (e) => {
+          setMidiVisibility(e.target.checked);
+        });
+      }
+
+      setMidiVisibility(isMidiVisible);
 
       // Render initial statuses
       if (data.status) {
