@@ -1448,6 +1448,18 @@ function initMidiTelemetry() {
   const collapseBtn = document.getElementById("midiToggleCollapseBtn");
   const grid = document.getElementById("midiColumnsGrid");
 
+  // Track whether the user has intentionally scrolled up to read past logs
+  const userScrolledUp = { mpk: false, apc: false, magic_pad: false };
+
+  Object.entries(logContainers).forEach(([dev, container]) => {
+    if (!container) return;
+    container.addEventListener("scroll", () => {
+      // If within 30px of bottom, auto-lock back to bottom tracking
+      const distFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+      userScrolledUp[dev] = distFromBottom > 30;
+    });
+  });
+
   let isCollapsed = false;
   if (collapseBtn && grid) {
     collapseBtn.addEventListener("click", () => {
@@ -1459,21 +1471,22 @@ function initMidiTelemetry() {
 
   if (clearBtn) {
     clearBtn.addEventListener("click", () => {
-      Object.values(logContainers).forEach(c => {
-        if (c) c.innerHTML = '<div class="log-placeholder">Logs cleared.</div>';
+      Object.entries(logContainers).forEach(([dev, c]) => {
+        if (c) {
+          c.innerHTML = '<div class="log-placeholder">Logs cleared.</div>';
+          userScrolledUp[dev] = false;
+        }
       });
     });
   }
 
-  function appendLogEntry(dev, entry) {
+  function appendLogEntry(dev, entry, forceScroll = false) {
     const container = logContainers[dev];
     if (!container || !entry || !entry.text) return;
 
     // Remove placeholder on first entry
     const placeholder = container.querySelector(".log-placeholder");
     if (placeholder) placeholder.remove();
-
-    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight <= 40;
 
     const div = document.createElement("div");
     div.className = "midi-log-entry";
@@ -1495,8 +1508,10 @@ function initMidiTelemetry() {
       container.removeChild(container.firstChild);
     }
 
-    if (isNearBottom) {
-      container.scrollTop = container.scrollHeight;
+    if (forceScroll || !userScrolledUp[dev]) {
+      requestAnimationFrame(() => {
+        container.scrollTop = container.scrollHeight;
+      });
     }
   }
 
@@ -1524,13 +1539,19 @@ function initMidiTelemetry() {
         Object.entries(data.status).forEach(([dev, st]) => updateStatus(dev, st));
       }
 
-      // Render initial logs
+      // Render initial logs and scroll to bottom
       if (data.logs) {
         Object.entries(data.logs).forEach(([dev, entries]) => {
           if (Array.isArray(entries) && entries.length > 0) {
             const container = logContainers[dev];
-            if (container) container.innerHTML = "";
-            entries.forEach(e => appendLogEntry(dev, e));
+            if (container) {
+              container.innerHTML = "";
+              entries.forEach(e => appendLogEntry(dev, e, true));
+              userScrolledUp[dev] = false;
+              requestAnimationFrame(() => {
+                container.scrollTop = container.scrollHeight;
+              });
+            }
           }
         });
       }
