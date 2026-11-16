@@ -127,6 +127,61 @@
       </div>
     </section>
 
+    <!-- Live MIDI Telemetry Section (Active when connected to Pi / VPN) -->
+    <section class="midi-telemetry-section" id="midiTelemetrySection" style="display: none;">
+      <div class="midi-telemetry-header">
+        <div class="midi-header-left">
+          <span class="dot green"></span>
+          <h2>Live MIDI Telemetry & Controller Logs</h2>
+          <span class="badge-online" id="midiConnectionBadge">HOST CONNECTED</span>
+        </div>
+        <div class="midi-header-actions">
+          <button type="button" class="btn-midi" id="midiClearLogsBtn">Clear</button>
+          <button type="button" class="btn-midi" id="midiToggleCollapseBtn">Collapse</button>
+        </div>
+      </div>
+      <div class="midi-columns-grid" id="midiColumnsGrid">
+        <!-- Column 1: Akai MPK Mini -->
+        <div class="midi-column" data-device="mpk">
+          <div class="midi-column-header">
+            <div class="col-title-row">
+              <span class="device-pill mpk">MPK MINI</span>
+              <span class="device-status" id="mpkStatus">Standby · Ready</span>
+            </div>
+          </div>
+          <div class="midi-log-container" id="mpkLog">
+            <div class="log-placeholder">Waiting for MPK Mini events...</div>
+          </div>
+        </div>
+
+        <!-- Column 2: Akai APC40 mkII -->
+        <div class="midi-column" data-device="apc">
+          <div class="midi-column-header">
+            <div class="col-title-row">
+              <span class="device-pill apc">APC40 MKII</span>
+              <span class="device-status" id="apcStatus">Standby · Ready</span>
+            </div>
+          </div>
+          <div class="midi-log-container" id="apcLog">
+            <div class="log-placeholder">Waiting for APC40 events...</div>
+          </div>
+        </div>
+
+        <!-- Column 3: Apple Magic Trackpad -->
+        <div class="midi-column" data-device="magic_pad">
+          <div class="midi-column-header">
+            <div class="col-title-row">
+              <span class="device-pill magic">MAGIC PAD</span>
+              <span class="device-status" id="magicStatus">Standby · Ready</span>
+            </div>
+          </div>
+          <div class="midi-log-container" id="magicLog">
+            <div class="log-placeholder">Waiting for Magic Trackpad events...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Graph Grid (Draggable & Reorderable) -->
     <div class="charts-layout" id="chartsLayout">
       <!-- 1. Oscilloscope -->

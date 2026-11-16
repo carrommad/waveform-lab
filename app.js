@@ -1424,3 +1424,150 @@ function initDraggablePanels() {
 
 initDraggablePanels();
 populateDevices();
+
+/* ==============================================================================
+   Live MIDI Telemetry & Categorized Controller Logs Client
+   ============================================================================== */
+function initMidiTelemetry() {
+  const section = document.getElementById("midiTelemetrySection");
+  if (!section) return;
+
+  const statusElements = {
+    mpk: document.getElementById("mpkStatus"),
+    apc: document.getElementById("apcStatus"),
+    magic_pad: document.getElementById("magicStatus"),
+  };
+
+  const logContainers = {
+    mpk: document.getElementById("mpkLog"),
+    apc: document.getElementById("apcLog"),
+    magic_pad: document.getElementById("magicLog"),
+  };
+
+  const clearBtn = document.getElementById("midiClearLogsBtn");
+  const collapseBtn = document.getElementById("midiToggleCollapseBtn");
+  const grid = document.getElementById("midiColumnsGrid");
+
+  let isCollapsed = false;
+  if (collapseBtn && grid) {
+    collapseBtn.addEventListener("click", () => {
+      isCollapsed = !isCollapsed;
+      grid.style.display = isCollapsed ? "none" : "grid";
+      collapseBtn.textContent = isCollapsed ? "Expand" : "Collapse";
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      Object.values(logContainers).forEach(c => {
+        if (c) c.innerHTML = '<div class="log-placeholder">Logs cleared.</div>';
+      });
+    });
+  }
+
+  function appendLogEntry(dev, entry) {
+    const container = logContainers[dev];
+    if (!container || !entry || !entry.text) return;
+
+    // Remove placeholder on first entry
+    const placeholder = container.querySelector(".log-placeholder");
+    if (placeholder) placeholder.remove();
+
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight <= 40;
+
+    const div = document.createElement("div");
+    div.className = "midi-log-entry";
+
+    const timeSpan = document.createElement("span");
+    timeSpan.className = "midi-log-time";
+    timeSpan.textContent = entry.time || "";
+
+    const textSpan = document.createElement("span");
+    textSpan.className = "midi-log-text";
+    textSpan.textContent = entry.text;
+
+    div.appendChild(timeSpan);
+    div.appendChild(textSpan);
+    container.appendChild(div);
+
+    // Keep DOM bounded to last 100 lines
+    while (container.childNodes.length > 100) {
+      container.removeChild(container.firstChild);
+    }
+
+    if (isNearBottom) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }
+
+  function updateStatus(dev, statusText) {
+    const el = statusElements[dev];
+    if (el && statusText) {
+      el.textContent = statusText;
+    }
+  }
+
+  // Probe server state endpoint
+  fetch("/api/midi/state", { cache: "no-store" })
+    .then(res => {
+      if (!res.ok) throw new Error("MIDI telemetry not available on this host");
+      return res.json();
+    })
+    .then(data => {
+      if (!data || !data.online) return;
+
+      // Reveal telemetry section
+      section.style.display = "flex";
+
+      // Render initial statuses
+      if (data.status) {
+        Object.entries(data.status).forEach(([dev, st]) => updateStatus(dev, st));
+      }
+
+      // Render initial logs
+      if (data.logs) {
+        Object.entries(data.logs).forEach(([dev, entries]) => {
+          if (Array.isArray(entries) && entries.length > 0) {
+            const container = logContainers[dev];
+            if (container) container.innerHTML = "";
+            entries.forEach(e => appendLogEntry(dev, e));
+          }
+        });
+      }
+
+      // Connect to SSE stream
+      let evtSource = null;
+      function connectSSE() {
+        evtSource = new EventSource("/api/midi/stream");
+
+        evtSource.onmessage = (e) => {
+          try {
+            const msg = JSON.parse(e.data);
+            if (msg.device) {
+              if (msg.entry) appendLogEntry(msg.device, msg.entry);
+              if (msg.status) updateStatus(msg.device, msg.status);
+            }
+          } catch (err) {
+            // Ignore parse errors on keepalive comments
+          }
+        };
+
+        evtSource.onerror = () => {
+          if (evtSource) {
+            evtSource.close();
+            evtSource = null;
+          }
+          // Retry connection after 5 seconds
+          setTimeout(connectSSE, 5000);
+        };
+      }
+
+      connectSSE();
+    })
+    .catch(() => {
+      // Offline fallback: keep section hidden (e.g. running statically on GitHub Pages)
+      section.style.display = "none";
+    });
+}
+
+initMidiTelemetry();

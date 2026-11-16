@@ -647,3 +647,190 @@ input[type="range"]:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
+
+/* ==============================================================================
+   Live MIDI Telemetry & Controller Logs Section
+   ============================================================================== */
+.midi-telemetry-section {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.midi-telemetry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  background: rgba(255, 255, 255, 0.025);
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.midi-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.midi-header-left h2 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+}
+
+.badge-online {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #00ffcc;
+  background: rgba(0, 255, 204, 0.12);
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  border-radius: 4px;
+  padding: 0.15rem 0.45rem;
+  text-transform: uppercase;
+}
+
+.midi-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-midi {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-midi:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.midi-columns-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--border-color);
+}
+
+@media (max-width: 900px) {
+  .midi-columns-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.midi-column {
+  background: #090c12;
+  display: flex;
+  flex-direction: column;
+  min-height: 180px;
+  max-height: 240px;
+}
+
+.midi-column-header {
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.col-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.device-pill {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.device-pill.mpk {
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+}
+
+.device-pill.apc {
+  background: rgba(187, 134, 252, 0.15);
+  color: #bb86fc;
+  border: 1px solid rgba(187, 134, 252, 0.35);
+}
+
+.device-pill.magic {
+  background: rgba(0, 255, 136, 0.15);
+  color: #00ff88;
+  border: 1px solid rgba(0, 255, 136, 0.35);
+}
+
+.device-status {
+  font-size: 0.75rem;
+  font-family: var(--font-ui);
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.midi-log-container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0.45rem 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: #c0cad8;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.midi-log-entry {
+  display: flex;
+  gap: 0.45rem;
+  word-break: break-word;
+}
+
+.midi-log-time {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.midi-log-text {
+  color: #d8e2ec;
+}
+
+.log-placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.7rem;
+  padding: 0.5rem 0;
+}
