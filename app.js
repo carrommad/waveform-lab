@@ -23,10 +23,16 @@ const freezeBtn = document.getElementById('freezeBtn');
 const deviceSelect = document.getElementById('deviceSelect');
 const monitorToggle = document.getElementById('monitorToggle');
 const monitorState = document.getElementById('monitorState');
-let monitorOn = false;
+let monitorOn = localStorage.getItem('waveform_monitor_speaker') === 'true';
+if (monitorToggle) monitorToggle.checked = monitorOn;
+if (monitorState) monitorState.textContent = monitorOn ? 'On' : 'Off';
+
 const filterWhineToggle = document.getElementById('filterWhineToggle');
 const filterWhineState = document.getElementById('filterWhineState');
-let filterWhineOn = false;
+let filterWhineOn = localStorage.getItem('waveform_filter_whine') === 'true';
+if (filterWhineToggle) filterWhineToggle.checked = filterWhineOn;
+if (filterWhineState) filterWhineState.textContent = filterWhineOn ? 'On' : 'Off';
+
 let currentWhineFreq = 7850;
 const inputGain = document.getElementById('inputGain');
 const gainVal = document.getElementById('gainVal');
@@ -113,7 +119,7 @@ function noteFromPitch(frequency) {
 // Returns -1 when the signal is too quiet or not clearly periodic (e.g. noise).
 const PITCH_WINDOW = 4096;     // samples analysed (enough for ~30 Hz periods)
 const PITCH_MIN_RMS = 0.003;   // ~ -50 dBFS
-const PITCH_MIN_CLARITY = 0.9; // 0..1, periodicity confidence
+const PITCH_MIN_CLARITY = 0.78; // 0..1, periodicity confidence (adapted for rich synth harmonics)
 const PITCH_MIN_HZ = 30;
 const PITCH_MAX_HZ = 4000;
 
@@ -167,7 +173,7 @@ function autoCorrelate(fullBuf, sampleRate) {
 const STORAGE_DEVICE_KEY = 'roland_s1_selected_device';
 
 async function populateDevices() {
-  if (!navigator.mediaDevices?.enumerateDevices) return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const audioInputs = devices.filter(d => d.kind === 'audioinput');
@@ -227,6 +233,23 @@ function resizeCanvases() {
 }
 window.addEventListener('resize', resizeCanvases);
 
+// Persistent static buffers for render loop (avoids 60 FPS GC thrashing)
+let bufTimeL = null;
+let bufTimeR = null;
+let bufFreqL = null;
+let bufFineTime = null;
+let bufFineFreq = null;
+let chromaBinPitchClass = null;
+let renderFrameCount = 0;
+let lastDetectedFreq = 0;
+let pitchHoldFrames = 0;
+
+function clearCanvas(cvs, ctx) {
+  if (!cvs || !ctx) return;
+  ctx.fillStyle = '#080a0f';
+  ctx.fillRect(0, 0, cvs.width, cvs.height);
+}
+
 // Audio Engine Init
 async function startAudio() {
   // If already running, clean up existing audio context and tracks first
@@ -281,6 +304,27 @@ async function startAudio() {
     splitterNode.connect(analyserRight, 1);
     splitterNode.connect(analyserFine, 0);
 
+    // Pre-allocate persistent typed arrays to avoid garbage collection thrashing in renderLoop
+    bufTimeL = new Float32Array(analyserLeft.fftSize);
+    bufTimeR = new Float32Array(analyserRight.fftSize);
+    bufFreqL = new Float32Array(analyserLeft.frequencyBinCount);
+    bufFineTime = new Float32Array(analyserFine.fftSize);
+    bufFineFreq = new Float32Array(analyserFine.frequencyBinCount);
+
+    // Precalculate Pitch Classes for Chromagram bins once per session
+    const fineBinCount = analyserFine.frequencyBinCount;
+    const nyquist = audioCtx.sampleRate / 2;
+    chromaBinPitchClass = new Int8Array(fineBinCount);
+    for (let i = 0; i < fineBinCount; i++) {
+      const f = (i * nyquist) / fineBinCount;
+      if (f >= 50 && f <= 4500) {
+        const midi = noteFromPitch(f);
+        chromaBinPitchClass[i] = ((midi % 12) + 12) % 12;
+      } else {
+        chromaBinPitchClass[i] = -1;
+      }
+    }
+
     // Monitoring pass-through to speakers/headphones
     monitorGainNode = audioCtx.createGain();
     monitorGainNode.gain.value = monitorOn ? 1.0 : 0;
@@ -328,6 +372,9 @@ async function startAudio() {
     toggleAudioBtn.textContent = 'Stop Audio';
     toggleAudioBtn.classList.add('active-stop');
     freezeBtn.disabled = false;
+    isFrozen = false;
+    freezeBtn.textContent = 'Freeze View';
+    freezeBtn.classList.remove('active');
 
     resizeCanvases();
     renderLoop();
@@ -342,17 +389,51 @@ async function startAudio() {
 
 function stopAudio() {
   if (animationId) cancelAnimationFrame(animationId);
-  if (stream) stream.getTracks().forEach(track => track.stop());
-  if (audioCtx) audioCtx.close();
-  audioCtx = null;
+  animationId = null;
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
+  }
+  if (audioCtx) {
+    audioCtx.close();
+    audioCtx = null;
+  }
+
+  isFrozen = false;
+  if (freezeBtn) {
+    freezeBtn.textContent = 'Freeze View';
+    freezeBtn.classList.remove('active');
+    freezeBtn.classList.remove('frozen');
+    freezeBtn.disabled = true;
+  }
+
   toggleAudioBtn.textContent = 'Start Audio';
   toggleAudioBtn.classList.remove('active-stop');
-  freezeBtn.disabled = true;
+
   pitchReadout.textContent = '--';
   freqReadout.textContent = '0.0 Hz';
   vcfReadout.textContent = '-- Hz';
   rmsReadout.innerHTML = '-&infin; / -&infin; dB';
   meterLevel.style.width = '0%';
+  if (clipIndicator) clipIndicator.classList.remove('active');
+  clipHoldFrames = 0;
+
+  // Clear canvases with baseline visuals
+  clearCanvas(oscCanvas, oscCtx);
+  drawGrid(oscCtx, oscCanvas.width, oscCanvas.height);
+
+  clearCanvas(fftCanvas, fftCtx);
+  drawGrid(fftCtx, fftCanvas.width, fftCanvas.height);
+
+  clearCanvas(waterfallCanvas, waterfallCtx);
+  waterfallHistory = [];
+
+  clearCanvas(harmonicsCanvas, harmonicsCtx);
+  drawGrid(harmonicsCtx, harmonicsCanvas.width, harmonicsCanvas.height, 16, 4);
+
+  clearCanvas(spectrogramCanvas, specCtx);
+  clearCanvas(chromaCanvas, chromaCtx);
+  clearCanvas(phaseCanvas, phaseCtx);
 }
 
 // Frequency axis helpers
@@ -555,21 +636,70 @@ function renderFFT(dataFreqL, w, h, sampleRate) {
     }
   }
 
-  // Estimate VCF Cutoff / Resonant peak (prominent peak above 80 Hz to reject AC line hum)
-  const minVcfBin = Math.max(2, Math.round((80 / nyquist) * binCount));
-  let peakVal = -Infinity;
-  let peakBin = 0;
+  // Estimate VCF Cutoff / Resonant peak & spectral rolloff
+  let totalEnergy = 0;
+  let maxVcfDb = -120;
+  let fundBinIndex = 0;
+  const minVcfBin = Math.max(2, Math.round((60 / nyquist) * binCount));
+  const maxVcfBin = Math.min(binCount - 1, Math.round((14000 / nyquist) * binCount));
 
-  for (let i = minVcfBin; i < binCount; i++) {
-    if (dataFreqL[i] > peakVal) {
-      peakVal = dataFreqL[i];
-      peakBin = i;
+  for (let i = minVcfBin; i <= maxVcfBin; i++) {
+    const db = dataFreqL[i];
+    if (db > maxVcfDb) {
+      maxVcfDb = db;
+      fundBinIndex = i;
+    }
+    if (db > -90) {
+      totalEnergy += Math.pow(10, db / 10);
+    }
+  }
+
+  // Look for a secondary resonant peak above the fundamental (filter resonance)
+  let resonantBin = 0;
+  let resonantVal = -120;
+  const searchStart = Math.min(maxVcfBin - 2, fundBinIndex + Math.max(3, Math.round((120 / nyquist) * binCount)));
+  for (let i = searchStart; i < maxVcfBin - 2; i++) {
+    const cur = dataFreqL[i];
+    if (cur > -68 && cur > dataFreqL[i - 1] && cur > dataFreqL[i + 1] &&
+        cur > dataFreqL[i - 2] && cur > dataFreqL[i + 2]) {
+      if (cur > resonantVal) {
+        resonantVal = cur;
+        resonantBin = i;
+      }
+    }
+  }
+
+  let cutoffFreq = 0;
+  let cutoffBin = 0;
+  let cutoffDb = -100;
+
+  if (resonantBin > 0 && resonantVal > maxVcfDb - 18) {
+    // Distinct resonant filter peak detected
+    cutoffBin = resonantBin;
+    cutoffDb = resonantVal;
+    cutoffFreq = (cutoffBin * nyquist) / binCount;
+  } else if (maxVcfDb > -60 && totalEnergy > 0) {
+    // Spectral rolloff: frequency below which 85% of total spectral power lies
+    let cumEnergy = 0;
+    const targetEnergy = totalEnergy * 0.85;
+    for (let i = minVcfBin; i <= maxVcfBin; i++) {
+      if (dataFreqL[i] > -90) {
+        cumEnergy += Math.pow(10, dataFreqL[i] / 10);
+      }
+      if (cumEnergy >= targetEnergy) {
+        cutoffBin = i;
+        cutoffDb = dataFreqL[i];
+        cutoffFreq = (cutoffBin * nyquist) / binCount;
+        break;
+      }
     }
   }
 
   // Only display cutoff if peak is legitimately prominent and above noise threshold (-60 dB)
-  if (peakVal > -60 && peakBin >= minVcfBin) {
-    const peakFreq = (peakBin * nyquist) / binCount;
+  if (cutoffFreq > 60 && maxVcfDb > -60 && cutoffBin >= minVcfBin) {
+    const peakFreq = cutoffFreq;
+    const peakVal = cutoffDb;
+    const peakBin = cutoffBin;
     vcfReadout.textContent = `${Math.round(peakFreq)} Hz`;
 
     let peakX = 0;
@@ -629,7 +759,6 @@ function render3DWaterfall(dataFreqL, w, h, sampleRate) {
   waterfallCtx.fillRect(0, 0, w, h);
 
   const reducedBins = 64;
-  const slice = new Float32Array(reducedBins);
   const nyquist = (sampleRate || 48000) / 2;
   const binCount = dataFreqL.length;
   const isLog = !waterfallLog || waterfallLog.checked;
@@ -644,6 +773,7 @@ function render3DWaterfall(dataFreqL, w, h, sampleRate) {
   // Push new slice every 2 animation frames for smooth cascading flow
   waterfallFrameCount++;
   if (waterfallFrameCount % 2 === 0) {
+    const slice = new Float32Array(reducedBins);
     for (let i = 0; i < reducedBins; i++) {
       const frac = i / (reducedBins - 1);
       let hz = 0;
@@ -903,14 +1033,24 @@ function renderChromagram(dataFreqL, sampleRate, w, h) {
   const nyquist = sampleRate / 2;
   const binCount = dataFreqL.length;
 
-  // Accumulate energy per pitch class across all octaves
-  for (let i = 2; i < binCount / 2; i++) {
-    const freq = (i * nyquist) / binCount;
-    if (freq < 50 || freq > 4500) continue;
-    const midi = noteFromPitch(freq);
-    const pClass = ((midi % 12) + 12) % 12;
-    const linAmp = Math.pow(10, dataFreqL[i] / 20);
-    chroma[pClass] += linAmp;
+  // Accumulate energy per pitch class across all octaves using precalculated mapping
+  if (chromaBinPitchClass) {
+    const limit = Math.min(Math.floor(binCount / 2), chromaBinPitchClass.length);
+    for (let i = 2; i < limit; i++) {
+      const pClass = chromaBinPitchClass[i];
+      if (pClass >= 0) {
+        chroma[pClass] += Math.pow(10, dataFreqL[i] / 20);
+      }
+    }
+  } else {
+    for (let i = 2; i < binCount / 2; i++) {
+      const freq = (i * nyquist) / binCount;
+      if (freq < 50 || freq > 4500) continue;
+      const midi = noteFromPitch(freq);
+      const pClass = ((midi % 12) + 12) % 12;
+      const linAmp = Math.pow(10, dataFreqL[i] / 20);
+      chroma[pClass] += linAmp;
+    }
   }
 
   let maxChroma = Math.max(...chroma, 0.000001);
@@ -1016,18 +1156,28 @@ function renderLoop() {
   animationId = requestAnimationFrame(renderLoop);
   if (isFrozen) return;
 
-  const bufferLength = analyserLeft.fftSize;
-  const dataTimeL = new Float32Array(bufferLength);
-  const dataTimeR = new Float32Array(bufferLength);
-  const dataFreqL = new Float32Array(analyserLeft.frequencyBinCount);
+  renderFrameCount++;
+
+  // Ensure persistent static buffers match analyser dimensions
+  if (!bufTimeL || bufTimeL.length !== analyserLeft.fftSize) {
+    bufTimeL = new Float32Array(analyserLeft.fftSize);
+    bufTimeR = new Float32Array(analyserRight.fftSize);
+    bufFreqL = new Float32Array(analyserLeft.frequencyBinCount);
+  }
+  if (!bufFineTime || bufFineTime.length !== analyserFine.fftSize) {
+    bufFineTime = new Float32Array(analyserFine.fftSize);
+    bufFineFreq = new Float32Array(analyserFine.frequencyBinCount);
+  }
+
+  const dataTimeL = bufTimeL;
+  const dataTimeR = bufTimeR;
+  const dataFreqL = bufFreqL;
+  const fineTime = bufFineTime;
+  const fineFreq = bufFineFreq;
 
   analyserLeft.getFloatTimeDomainData(dataTimeL);
   analyserRight.getFloatTimeDomainData(dataTimeR);
   analyserLeft.getFloatFrequencyData(dataFreqL);
-
-  // High-resolution data for pitch / harmonics / chroma
-  const fineTime = new Float32Array(analyserFine.fftSize);
-  const fineFreq = new Float32Array(analyserFine.frequencyBinCount);
   analyserFine.getFloatTimeDomainData(fineTime);
   analyserFine.getFloatFrequencyData(fineFreq);
 
@@ -1121,13 +1271,35 @@ function renderLoop() {
   else if (clipHoldFrames > 0) clipHoldFrames--;
   if (clipIndicator) clipIndicator.classList.toggle('active', clipHoldFrames > 0);
 
-  const freq = autoCorrelate(fineTime, audioCtx.sampleRate);
-  if (freq !== -1 && freq > 20 && freq < 4000) {
-    const midi = noteFromPitch(freq);
+  // Interleaved pitch detection with pitch hold to eliminate transient flickering
+  let detectedFreq = 0;
+  if (renderFrameCount % 2 === 0) {
+    const rawFreq = autoCorrelate(fineTime, audioCtx.sampleRate);
+    if (rawFreq > 20 && rawFreq < 4000) {
+      detectedFreq = rawFreq;
+      lastDetectedFreq = rawFreq;
+      pitchHoldFrames = 6;
+    } else if (pitchHoldFrames > 0) {
+      pitchHoldFrames--;
+      detectedFreq = lastDetectedFreq;
+    } else if (dynamicPeakDb > -60.0) {
+      // Fallback spectral peak for complex synth waveforms when autocorrelation misses
+      const specFund = getSpectralFundamental(dataFreqL, audioCtx.sampleRate / 2);
+      if (specFund > 20) {
+        detectedFreq = specFund;
+        lastDetectedFreq = specFund;
+      }
+    }
+  } else {
+    detectedFreq = lastDetectedFreq;
+  }
+
+  if (detectedFreq > 20 && detectedFreq < 4000) {
+    const midi = noteFromPitch(detectedFreq);
     const note = NOTE_STRINGS[midi % 12];
     const octave = Math.floor(midi / 12) - 1;
     pitchReadout.textContent = `${note}${octave}`;
-    freqReadout.textContent = `${freq.toFixed(1)} Hz`;
+    freqReadout.textContent = `${detectedFreq.toFixed(1)} Hz`;
   } else {
     pitchReadout.textContent = '--';
     freqReadout.textContent = '-- Hz';
@@ -1136,18 +1308,26 @@ function renderLoop() {
   // Update dynamic range AGC for spectrogram auto-scaling
   updateDynamicRange(dataFreqL, audioCtx.sampleRate / 2);
 
+  const activeFreq = detectedFreq > 20 ? detectedFreq : 0;
+
   // Draw 6 comprehensive synth graphs
-  renderOscilloscope(dataTimeL, oscCanvas.width, oscCanvas.height, freq > 20 ? freq : 0, audioCtx.sampleRate);
+  renderOscilloscope(dataTimeL, oscCanvas.width, oscCanvas.height, activeFreq, audioCtx.sampleRate);
   renderFFT(dataFreqL, fftCanvas.width, fftCanvas.height, audioCtx.sampleRate);
   render3DWaterfall(dataFreqL, waterfallCanvas.width, waterfallCanvas.height, audioCtx.sampleRate);
-  renderHarmonics(fineFreq, freq > 20 ? freq : 0, audioCtx.sampleRate, harmonicsCanvas.width, harmonicsCanvas.height);
+  renderHarmonics(fineFreq, activeFreq, audioCtx.sampleRate, harmonicsCanvas.width, harmonicsCanvas.height);
   renderSpectrogram(dataFreqL, spectrogramCanvas.width, spectrogramCanvas.height, audioCtx.sampleRate);
   renderChromagram(fineFreq, audioCtx.sampleRate, chromaCanvas.width, chromaCanvas.height);
   renderPhaseScope(dataTimeL, dataTimeR, phaseCanvas.width, phaseCanvas.height);
 }
 
 // Event Listeners
-toggleAudioBtn.addEventListener('click', startAudio);
+toggleAudioBtn.addEventListener('click', () => {
+  if (audioCtx) {
+    stopAudio();
+  } else {
+    startAudio();
+  }
+});
 freezeBtn.addEventListener('click', () => {
   isFrozen = !isFrozen;
   freezeBtn.textContent = isFrozen ? 'Resume' : 'Freeze View';
@@ -1205,6 +1385,9 @@ monitorToggle.addEventListener('change', () => {
   if (monitorState) {
     monitorState.textContent = monitorOn ? 'On' : 'Off';
   }
+  try {
+    localStorage.setItem('waveform_monitor_speaker', String(monitorOn));
+  } catch (_) {}
   if (monitorGainNode && audioCtx) {
     monitorGainNode.gain.setTargetAtTime(monitorOn ? 1.0 : 0, audioCtx.currentTime, 0.02);
   }
@@ -1247,6 +1430,9 @@ filterWhineToggle.addEventListener('change', () => {
   if (filterWhineState) {
     filterWhineState.textContent = filterWhineOn ? 'On' : 'Off';
   }
+  try {
+    localStorage.setItem('waveform_filter_whine', String(filterWhineOn));
+  } catch (_) {}
   updateWhineFilterRouting();
 });
 

@@ -483,17 +483,14 @@ select {
 }
 
 .panel-header {
-  display: flex !important;
-  flex-direction: column !important;
+  display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: stretch !important;
-  padding: 0.6rem 0.9rem;
+  align-items: stretch;
+  padding: 0.65rem 0.9rem;
   background: rgba(10, 14, 22, 0.7);
   border-bottom: 1px solid var(--border-color);
-  gap: 0.35rem;
-  height: 72px;
-  min-height: 72px;
-  max-height: 72px;
+  gap: 0.45rem;
   box-sizing: border-box;
   user-select: none;
 }

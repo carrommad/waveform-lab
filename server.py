@@ -8,6 +8,7 @@ Zero external dependencies (pure Python standard library).
 import argparse
 import json
 import os
+import queue
 import re
 import socket
 import subprocess
@@ -34,7 +35,7 @@ _status: Dict[str, str] = {
     "apc": "Standby · Ready",
     "magic_pad": "Standby · Ready",
 }
-_subscribers: Set["MidiStreamHandler"] = set()
+_subscribers: Set[queue.Queue] = set()
 
 
 def _clean_ansi(text: str) -> str:
@@ -78,6 +79,21 @@ def _parse_and_route_line(unit: str, msg: str):
     if dev == "mpk":
         if "SET MELÓDICO SELECCIONADO" in clean or "KEYBOARD SELECT" in clean:
             match = re.search(r"(?:->|:)\s*(.+?)(?:\s*\(Prog|\s*$)", clean)
+            if match:
+                status_update = f"Melodic: {match.group(1).strip()}"
+        elif "PAD CC" in clean and ("TAP" in clean or "MANTENIDO" in clean) and "Instrumento" in clean:
+            match = re.search(r":\s*(.+?)(?:\s*\(Prog|\s*$)", clean)
+            if match:
+                status_update = f"Melodic: {match.group(1).strip()}"
+        elif "RANDOM" in clean and ("RECALL" in clean or "RE-ROLL" in clean):
+            keys_match = re.search(r"Keys:\s*(.+?)(?:\s*\||\s*$)", clean)
+            drums_match = re.search(r"Drums:\s*(.+?)$", clean)
+            if keys_match:
+                status_update = f"Preset: {keys_match.group(1).strip()}"
+            elif drums_match:
+                status_update = f"Drums: {drums_match.group(1).strip()}"
+        elif "RESET DEFAULT COMPLETADO" in clean:
+            match = re.search(r"1er Instrumento:\s*(.+?)(?:\s*\||\s*$)", clean)
             if match:
                 status_update = f"Melodic: {match.group(1).strip()}"
         elif "DRUM SET SELECCIONADO" in clean:
@@ -135,24 +151,23 @@ def _parse_and_route_line(unit: str, msg: str):
         "status": active_status,
     })
 
-    for sub in subs:
+    for client_queue in subs:
         try:
-            sub.send_event(payload)
-        except Exception:
-            with _lock:
-                _subscribers.discard(sub)
+            client_queue.put_nowait(payload)
+        except queue.Full:
+            pass  # Drop if client queue is saturated to prevent blocking the reader
 
 
 def _journal_listener_thread():
     """Background thread following systemd journal for the 3 controllers."""
     cmd = [
         "journalctl",
+        "-q",
         "-u", "synth.service",
         "-u", "apc40.service",
         "-u", "magicpad.service",
         "-f",
         "-n", "30",
-        "--no-tail",
         "-o", "json",
     ]
 
@@ -232,32 +247,32 @@ class MidiStreamHandler(SimpleHTTPRequestHandler):
             self.send_header("X-Accel-Buffering", "no")
             self.end_headers()
 
-            # Register SSE client
+            client_queue = queue.Queue(maxsize=100)
             with _lock:
-                _subscribers.add(self)
+                _subscribers.add(client_queue)
 
-            # Send initial ping event
+            # Send initial connected greeting and stream events from queue
             try:
                 self.wfile.write(b": connected\n\n")
                 self.wfile.flush()
                 while True:
-                    time.sleep(15)
-                    self.wfile.write(b": ping\n\n")
-                    self.wfile.flush()
+                    try:
+                        event_data = client_queue.get(timeout=15.0)
+                        msg = f"data: {event_data}\n\n".encode("utf-8")
+                        self.wfile.write(msg)
+                        self.wfile.flush()
+                    except queue.Empty:
+                        self.wfile.write(b": ping\n\n")
+                        self.wfile.flush()
             except (ConnectionResetError, BrokenPipeError, socket.error):
                 pass
             finally:
                 with _lock:
-                    _subscribers.discard(self)
+                    _subscribers.discard(client_queue)
             return
 
         # Serve static visualizer assets
         super().do_GET()
-
-    def send_event(self, data_str: str):
-        payload = f"data: {data_str}\n\n".encode("utf-8")
-        self.wfile.write(payload)
-        self.wfile.flush()
 
     def log_message(self, fmt, *args):
         # Silence routine static asset spam in terminal
