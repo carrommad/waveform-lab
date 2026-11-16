@@ -11,6 +11,7 @@ import os
 import queue
 import re
 import socket
+import ssl
 import subprocess
 import sys
 import threading
@@ -281,29 +282,73 @@ class MidiStreamHandler(SimpleHTTPRequestHandler):
         # super().log_message(fmt, *args)
 
 
+def _ensure_ssl_certs():
+    """Ensure a self-signed TLS certificate exists for HTTPS LAN operation."""
+    cert_dir = os.path.expanduser("~/.waveform-lab-certs")
+    os.makedirs(cert_dir, exist_ok=True)
+    cert_file = os.path.join(cert_dir, "cert.pem")
+    key_file = os.path.join(cert_dir, "key.pem")
+    if not (os.path.exists(cert_file) and os.path.exists(key_file)):
+        cmd = [
+            "openssl", "req", "-x509",
+            "-newkey", "rsa:2048",
+            "-keyout", key_file,
+            "-out", cert_file,
+            "-days", "3650",
+            "-nodes",
+            "-subj", "/CN=waveform-lab",
+        ]
+        subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return cert_file, key_file
+
+
 def main():
     parser = argparse.ArgumentParser(description="Waveform Lab Web & MIDI Telemetry Server")
     parser.add_argument("--port", "-p", type=int, default=int(os.environ.get("PORT", DEFAULT_PORT)),
-                        help=f"Port to listen on (default: {DEFAULT_PORT})")
+                        help=f"HTTP Port to listen on (default: {DEFAULT_PORT})")
+    parser.add_argument("--ssl-port", type=int, default=int(os.environ.get("SSL_PORT", 8443)),
+                        help="HTTPS Port to listen on (default: 8443, 0 to disable)")
+    parser.add_argument("--no-ssl", action="store_true", help="Disable HTTPS server")
     args = parser.parse_args()
 
     # Start journalctl background follower
     t = threading.Thread(target=_journal_listener_thread, daemon=True)
     t.start()
 
-    server_address = ("0.0.0.0", args.port)
-    httpd = ThreadingHTTPServer(server_address, MidiStreamHandler)
-    print(f"==================================================================")
-    print(f" Waveform Lab - Audio Visualizer & Multi-Device MIDI Telemetry   ")
-    print(f" Server running at http://0.0.0.0:{args.port}/                   ")
-    print(f" Endpoints: /api/midi/state, /api/midi/stream                     ")
-    print(f"==================================================================", flush=True)
+    # 1. HTTP Server
+    http_address = ("0.0.0.0", args.port)
+    httpd = ThreadingHTTPServer(http_address, MidiStreamHandler)
+
+    # 2. HTTPS Server (for secure microphone context on LAN IP)
+    https_server = None
+    if not args.no_ssl and args.ssl_port > 0:
+        try:
+            cert_file, key_file = _ensure_ssl_certs()
+            ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            ssl_ctx.load_cert_chain(certfile=cert_file, keyfile=key_file)
+            https_address = ("0.0.0.0", args.ssl_port)
+            https_server = ThreadingHTTPServer(https_address, MidiStreamHandler)
+            https_server.socket = ssl_ctx.wrap_socket(https_server.socket, server_side=True)
+            https_thread = threading.Thread(target=https_server.serve_forever, daemon=True)
+            https_thread.start()
+        except Exception as e:
+            print(f"[!] HTTPS setup warning: {e} (running HTTP only)")
+
+    print("==================================================================")
+    print(" Waveform Lab - Audio Visualizer & Multi-Device MIDI Telemetry   ")
+    print(f" HTTP Server:  http://0.0.0.0:{args.port}/ (or localhost:{args.port})")
+    if https_server:
+        print(f" HTTPS Server: https://0.0.0.0:{args.ssl_port}/ (Secure Context for LAN)")
+    print(" Endpoints:    /api/midi/state, /api/midi/stream                 ")
+    print("==================================================================", flush=True)
 
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         print("\nStopping server...")
         httpd.server_close()
+        if https_server:
+            https_server.server_close()
 
 
 if __name__ == "__main__":

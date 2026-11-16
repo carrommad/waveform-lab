@@ -5,12 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Roland S-1 Wave Visualizer</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Insecure Context LAN Banner (Audio input requires HTTPS on non-localhost IPs) -->
+  <div id="insecureBanner" class="insecure-banner" style="display: none;">
+    <div class="insecure-banner-inner">
+      <div class="insecure-text">
+        <span class="insecure-icon">🔒</span>
+        <strong>Microphone capture blocked:</strong> Browsers require HTTPS on LAN IPs. Switch to the secure port to enable audio analysis.
+      </div>
+      <div class="insecure-actions">
+        <a id="httpsSwitchBtn" href="#" class="btn-insecure primary">Switch to HTTPS (Port 8443)</a>
+        <button type="button" id="insecureDismissBtn" class="btn-insecure secondary">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
   <header class="app-header">
     <div class="header-left">
       <div class="logo-mark">
@@ -317,6 +331,6 @@
     <p>Tip: Connect Roland S-1 via USB-C (audio class compliant) or audio line-in. Adjust input level on device to avoid clipping.</p>
   </footer>
 
-  <script src="app.js?v=30"></script>
+  <script src="app.js?v=31"></script>
 </body>
 </html>

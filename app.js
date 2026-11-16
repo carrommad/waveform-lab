@@ -250,8 +250,46 @@ function clearCanvas(cvs, ctx) {
   ctx.fillRect(0, 0, cvs.width, cvs.height);
 }
 
+// Check for insecure context (e.g. plain HTTP on LAN IP) where browsers block getUserMedia
+function checkSecureContext() {
+  const isHttpIp = window.location.protocol === 'http:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+  if (isHttpIp && (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia)) {
+    const banner = document.getElementById('insecureBanner');
+    const switchBtn = document.getElementById('httpsSwitchBtn');
+    const dismissBtn = document.getElementById('insecureDismissBtn');
+    if (banner) banner.style.display = 'block';
+    if (switchBtn) {
+      switchBtn.href = `https://${window.location.hostname}:8443${window.location.pathname}`;
+    }
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', () => {
+        banner.style.display = 'none';
+      });
+    }
+  }
+}
+checkSecureContext();
+
 // Audio Engine Init
 async function startAudio() {
+  // If browser blocks getUserMedia due to plain HTTP on LAN IP, guide user to HTTPS port 8443
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    const isHttpIp = window.location.protocol === 'http:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    if (isHttpIp) {
+      const httpsUrl = `https://${window.location.hostname}:8443${window.location.pathname}`;
+      const switchNow = confirm(
+        "Microphone capture is blocked by your browser on plain HTTP LAN IPs (Secure Context required).\n\n" +
+        "Would you like to open the secure HTTPS version on port 8443 now?"
+      );
+      if (switchNow) {
+        window.location.href = httpsUrl;
+      }
+    } else {
+      alert("Audio input is not supported or permitted on this connection (Secure Context required).");
+    }
+    return;
+  }
+
   // If already running, clean up existing audio context and tracks first
   if (audioCtx) {
     stopAudio();
