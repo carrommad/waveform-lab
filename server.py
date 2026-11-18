@@ -22,7 +22,7 @@ from typing import Dict, List, Optional, Set
 from urllib.parse import urlparse
 
 DEFAULT_PORT = 8080
-MAX_HISTORY = 60
+MAX_HISTORY = 300
 
 # Telemetry state
 _lock = threading.Lock()
@@ -78,29 +78,57 @@ def _parse_and_route_line(unit: str, msg: str):
     status_update = None
 
     if dev == "mpk":
-        if "SET MELÓDICO SELECCIONADO" in clean or "KEYBOARD SELECT" in clean:
-            match = re.search(r"(?:->|:)\s*(.+?)(?:\s*\(Prog|\s*$)", clean)
+        if "PRESET BEAT ▶" in clean:
+            match = re.search(r"'(.*?)'\s*a\s*(\d+\s*BPM)", clean)
             if match:
-                status_update = f"Melodic: {match.group(1).strip()}"
-        elif "PAD CC" in clean and ("TAP" in clean or "MANTENIDO" in clean) and "Instrumento" in clean:
-            match = re.search(r":\s*(.+?)(?:\s*\(Prog|\s*$)", clean)
-            if match:
-                status_update = f"Melodic: {match.group(1).strip()}"
+                status_update = f"Preset: '{match.group(1)}' ({match.group(2)})"
+        elif "PRESET BEAT ⏹" in clean:
+            match = re.search(r"'(.*?)'\s*detenido", clean)
+            status_update = f"Preset: '{match.group(1)}' Detenido" if match else "Preset: Detenido"
         elif "RANDOM" in clean and ("RECALL" in clean or "RE-ROLL" in clean):
-            keys_match = re.search(r"Keys:\s*(.+?)(?:\s*\||\s*$)", clean)
-            drums_match = re.search(r"Drums:\s*(.+?)$", clean)
-            if keys_match:
-                status_update = f"Preset: {keys_match.group(1).strip()}"
-            elif drums_match:
-                status_update = f"Drums: {drums_match.group(1).strip()}"
-        elif "RESET DEFAULT COMPLETADO" in clean:
-            match = re.search(r"1er Instrumento:\s*(.+?)(?:\s*\||\s*$)", clean)
+            keys_match = re.search(r"Keys:\s*\[?(?:[\d\.]+\s*)?([^\]]+?)\]?\s*(.+?)(?:\s*\(Prog|\s*\|)", clean)
+            drums_match = re.search(r"Drums:\s*Kit\s*\d+\s*(.+?)(?:\s*\(Kit|\s*$)", clean)
+            k_name = keys_match.group(2).strip() if keys_match else ""
+            d_name = drums_match.group(1).strip() if drums_match else ""
+            if k_name and d_name:
+                status_update = f"Random: 🎹 {k_name} | 🥁 {d_name}"
+            elif k_name:
+                status_update = f"Random Keys: {k_name}"
+            elif d_name:
+                status_update = f"Random Drums: {d_name}"
+        elif "SET MELÓDICO SELECCIONADO" in clean:
+            match = re.search(r"->\s*([\d\.]+\s*.+?)\s*(?:\(1er Sonido:\s*(.+?)\)|\(|$)", clean)
             if match:
-                status_update = f"Melodic: {match.group(1).strip()}"
+                set_name = match.group(1).strip()
+                sound_name = match.group(2).strip() if match.group(2) else ""
+                status_update = f"Keys: {sound_name} ({set_name})" if sound_name else f"Keys Set: {set_name}"
+        elif "KEYBOARD SELECT" in clean:
+            match = re.search(r"Tecla \d+:\s*(.+?)(?:\s*\(Prog|\s*$)", clean)
+            if match:
+                status_update = f"Keys: {match.group(1).strip()}"
+        elif "PAD CC" in clean and ("TAP" in clean or "MANTENIDO" in clean):
+            if "Instrumento" in clean:
+                match = re.search(r":\s*(.+?)(?:\s*\(Prog|\s*$)", clean)
+                if match:
+                    status_update = f"Keys: {match.group(1).strip()}"
+            elif "Set Siguiente" in clean or "Set Anterior" in clean or "Set" in clean:
+                match = re.search(r"Set\s*(?:Siguiente|Anterior)?:\s*(.+?)(?:\s*\(|\s*$)", clean)
+                if match:
+                    status_update = f"Keys Set: {match.group(1).strip()}"
         elif "DRUM SET SELECCIONADO" in clean:
             match = re.search(r"Kit \d+:\s*(.+?)(?:\s*\(Kit|\s*$)", clean)
             if match:
                 status_update = f"Drums: {match.group(1).strip()}"
+        elif "NUEVOS INSTRUMENTOS FIJADOS" in clean:
+            status_update = "Looper: Voces Fijadas 🔒"
+        elif "RE-VOICE MODE" in clean:
+            if "RE-VOICE ALL" in clean:
+                status_update = "Looper: Re-Voice Audición 🔀"
+            else:
+                status_update = "Looper: Bloqueo Voces 🔒"
+        elif "RESET DEFAULT COMPLETADO" in clean:
+            match = re.search(r"1er Instrumento:\s*(.+?)(?:\s*\||\s*$)", clean)
+            status_update = f"Reset: {match.group(1).strip()}" if match else "Reset: Factory Default"
         elif "LOOPER" in clean and ("CONFIRMADOS" in clean or "COMPASES" in clean or "BPM" in clean):
             match = re.search(r"(\d+\s*compás.*?BPM|MODO LIBRE.*?BPM|\d+\s*BPM)", clean)
             if match:
@@ -139,8 +167,20 @@ def _parse_and_route_line(unit: str, msg: str):
                 status_update = f"Volume: {match.group(1).strip()}"
 
     # Broadcast to memory and subscribers
+    is_knob = clean.startswith("[KNOB ")
+    knob_id = clean.split("]")[0] if is_knob else None
+
     with _lock:
-        _history[dev].append(entry)
+        coalesced = False
+        if is_knob and len(_history[dev]) > 0:
+            last_item = _history[dev][-1]
+            if last_item.get("text", "").startswith(knob_id):
+                last_item["text"] = clean
+                last_item["time"] = timestamp
+                entry = last_item
+                coalesced = True
+        if not coalesced:
+            _history[dev].append(entry)
         if status_update:
             _status[dev] = status_update
         active_status = _status[dev]
@@ -150,6 +190,7 @@ def _parse_and_route_line(unit: str, msg: str):
         "device": dev,
         "entry": entry,
         "status": active_status,
+        "coalesced": coalesced,
     })
 
     for client_queue in subs:
@@ -162,13 +203,14 @@ def _parse_and_route_line(unit: str, msg: str):
 def _journal_listener_thread():
     """Background thread following systemd journal for the 3 controllers."""
     cmd = [
+        "stdbuf", "-oL", "-eL",
         "journalctl",
         "-q",
         "-u", "synth.service",
         "-u", "apc40.service",
         "-u", "magicpad.service",
         "-f",
-        "-n", "30",
+        "-n", "100",
         "-o", "json",
     ]
 
@@ -185,7 +227,10 @@ def _journal_listener_thread():
                 time.sleep(5)
                 continue
 
-            for raw_line in proc.stdout:
+            while True:
+                raw_line = proc.stdout.readline()
+                if not raw_line:
+                    break
                 if not raw_line.strip():
                     continue
                 try:
@@ -199,8 +244,18 @@ def _journal_listener_thread():
 
             proc.wait()
         except FileNotFoundError:
-            # Not on Linux / systemd, sleep gracefully
-            time.sleep(10)
+            # Fallback if stdbuf is missing on non-Linux
+            cmd = [
+                "journalctl",
+                "-q",
+                "-u", "synth.service",
+                "-u", "apc40.service",
+                "-u", "magicpad.service",
+                "-f",
+                "-n", "100",
+                "-o", "json",
+            ]
+            time.sleep(5)
         except Exception:
             time.sleep(3)
 

@@ -1795,7 +1795,7 @@ function initMidiTelemetry() {
     });
   }
 
-  function appendLogEntry(dev, entry, forceScroll = false) {
+  function appendLogEntry(dev, entry, forceScroll = false, coalesced = false) {
     const container = logContainers[dev];
     if (!container || !entry || !entry.text) return;
 
@@ -1803,8 +1803,37 @@ function initMidiTelemetry() {
     const placeholder = container.querySelector(".log-placeholder");
     if (placeholder) placeholder.remove();
 
+    const isKnob = entry.text.startsWith("[KNOB ");
+    const knobPrefix = isKnob ? entry.text.split("]")[0] : null;
+
+    if (coalesced || isKnob) {
+      const last = container.lastElementChild;
+      if (last && last.classList.contains("midi-log-entry")) {
+        const lastTextEl = last.querySelector(".midi-log-text");
+        if (lastTextEl && knobPrefix && lastTextEl.textContent.startsWith(knobPrefix)) {
+          lastTextEl.textContent = entry.text;
+          const lastTimeEl = last.querySelector(".midi-log-time");
+          if (lastTimeEl && entry.time) lastTimeEl.textContent = entry.time;
+          return;
+        }
+      }
+    }
+
     const div = document.createElement("div");
     div.className = "midi-log-entry";
+
+    const txt = entry.text;
+    if (txt.includes("SET MELÓDICO") || txt.includes("KEYBOARD SELECT") || txt.includes("Instrumento Siguiente") || txt.includes("Instrumento Anterior")) {
+      div.classList.add("log-melodic");
+    } else if (txt.includes("DRUM SET") || txt.includes("DRUM KIT")) {
+      div.classList.add("log-drum");
+    } else if (txt.includes("RANDOM")) {
+      div.classList.add("log-random");
+    } else if (txt.includes("PRESET BEAT")) {
+      div.classList.add("log-preset");
+    } else if (txt.includes("LOOPER") || txt.includes("RE-VOICE")) {
+      div.classList.add("log-looper");
+    }
 
     const timeSpan = document.createElement("span");
     timeSpan.className = "midi-log-time";
@@ -1818,8 +1847,8 @@ function initMidiTelemetry() {
     div.appendChild(textSpan);
     container.appendChild(div);
 
-    // Keep DOM bounded to last 100 lines
-    while (container.childNodes.length > 100) {
+    // Keep DOM bounded to last 250 lines
+    while (container.childNodes.length > 250) {
       container.removeChild(container.firstChild);
     }
 
@@ -1905,7 +1934,7 @@ function initMidiTelemetry() {
           try {
             const msg = JSON.parse(e.data);
             if (msg.device) {
-              if (msg.entry) appendLogEntry(msg.device, msg.entry);
+              if (msg.entry) appendLogEntry(msg.device, msg.entry, false, Boolean(msg.coalesced));
               if (msg.status) updateStatus(msg.device, msg.status);
             }
           } catch (err) {

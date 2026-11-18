@@ -825,6 +825,31 @@ input[type="range"]:disabled {
   color: #d8e2ec;
 }
 
+.midi-log-entry.log-melodic .midi-log-text {
+  color: #70d6ff;
+  font-weight: 600;
+}
+
+.midi-log-entry.log-drum .midi-log-text {
+  color: #ff9770;
+  font-weight: 600;
+}
+
+.midi-log-entry.log-random .midi-log-text {
+  color: #ffd670;
+  font-weight: 600;
+}
+
+.midi-log-entry.log-preset .midi-log-text {
+  color: #e7c6ff;
+  font-weight: 600;
+}
+
+.midi-log-entry.log-looper .midi-log-text {
+  color: #80ed99;
+  font-weight: 600;
+}
+
 .log-placeholder {
   color: var(--text-muted);
   font-style: italic;
