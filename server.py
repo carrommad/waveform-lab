@@ -122,10 +122,18 @@ def _parse_and_route_line(unit: str, msg: str):
         elif "NUEVOS INSTRUMENTOS FIJADOS" in clean:
             status_update = "Looper: Voces Fijadas 🔒"
         elif "RE-VOICE MODE" in clean:
-            if "RE-VOICE ALL" in clean:
-                status_update = "Looper: Re-Voice Audición 🔀"
-            else:
+            if "MULTI-INSTRUMENT LOCK" in clean:
                 status_update = "Looper: Bloqueo Voces 🔒"
+            elif "RE-VOICE ALL" in clean:
+                status_update = "Looper: Re-Voice Todo 🔀"
+            else:
+                match = re.search(r"RE-VOICE PISTAS\s+([0-9,\s]+)", clean)
+                if match:
+                    status_update = f"Looper: Re-Voice P{match.group(1).strip().replace(' ', '')} 🔀"
+                elif "RE-VOICE PISTA ACTUAL" in clean:
+                    status_update = "Looper: Re-Voice Última 🔀"
+                else:
+                    status_update = "Looper: Re-Voice Audición 🔀"
         elif "RESET DEFAULT COMPLETADO" in clean:
             match = re.search(r"1er Instrumento:\s*(.+?)(?:\s*\||\s*$)", clean)
             status_update = f"Reset: {match.group(1).strip()}" if match else "Reset: Factory Default"
