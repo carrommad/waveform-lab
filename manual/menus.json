@@ -31,59 +31,65 @@
   },
   "mpk_root": {
     "title": "🎹 <b>Akai MPK Mini MK3</b>",
-    "layout": "2col",
+    "layout": "1col",
     "items": [
       {
-        "label": "🎹 [K] Keys",
+        "label": "🎹 [K] Keys (C) · 8 Sound Sets",
         "goto": "mpk_sets"
       },
       {
-        "label": "🥁 [D] Drums",
+        "label": "🥁 [D] Drums (C#) · 16 Kits & Pads",
         "goto": "mpk_drums"
       },
       {
-        "label": "🔁 [L] Looper",
+        "label": "🔁 [L] Looper (D) · 8-Track Looper",
         "goto": "mpk_looper"
       },
       {
-        "label": "📻 [P] Presets",
+        "label": "📻 [P] Presets (D#) · 16 Beat Grooves",
         "goto": "mpk_presets"
       },
       {
-        "label": "🎲 [R] Random",
+        "label": "🎲 [R] Random (E) · 16 Random Slots",
         "goto": "mpk_random"
       },
       {
-        "label": "🎵 [S] Songs",
+        "label": "🎵 [S] Songs (F) · 16 Saved Songs",
         "goto": "mpk_songs"
-      },
-      {
-        "label": "🔴 CC Bank A",
-        "goto": "mpk_cca"
-      },
-      {
-        "label": "🟢 CC Bank B",
-        "goto": "mpk_ccb"
-      },
-      {
-        "label": "🎛️ 8 Knobs",
-        "goto": "mpk_knobs"
-      },
-      {
-        "label": "🥁 Drum Pads",
-        "goto": "mpk_pads"
-      },
-      {
-        "label": "❓ Live Q&A",
-        "goto": "mpk_qa"
-      },
-      {
-        "label": "📄 PDF MPK",
-        "pdf": "pdfs/Manual_Instrucciones_Akai_MPK_Mini.pdf"
       }
     ],
-    "back": "synth_hub",
-    "back_label": "🔙 Synth Hub"
+    "bottom_rows": [
+      [
+        {
+          "label": "🔴 CC Bank A",
+          "goto": "mpk_cca"
+        },
+        {
+          "label": "🟢 CC Bank B",
+          "goto": "mpk_ccb"
+        }
+      ],
+      [
+        {
+          "label": "🎛️ 8 Knobs",
+          "goto": "mpk_knobs"
+        },
+        {
+          "label": "❓ Live Q&A",
+          "goto": "mpk_qa"
+        }
+      ],
+      [
+        {
+          "label": "📄 PDF MPK",
+          "pdf": "pdfs/Manual_Instrucciones_Akai_MPK_Mini.pdf"
+        },
+        {
+          "label": "🔙 Synth Hub",
+          "goto": "synth_hub"
+        }
+      ]
+    ]
   },
   "mpk_knobs": {
     "title": "🎛️ <b>MPK Mini — 8 Knobs</b>",
@@ -148,14 +154,10 @@
       {
         "label": "Bank B (5–8) · HiTom | Crash | Tom | Ride",
         "popup": "🥁 Drum Pads Bank B (Top Row)\n• Pad 5: Hi-Mid Tom (48) | Pad 6: Crash Cymbal (49)\n• Pad 7: High Tom (50) | Pad 8: Ride Cymbal (51)"
-      },
-      {
-        "label": "🥁 Browse 16 Drum Kits ([D] C# + Pad)",
-        "goto": "mpk_drums"
       }
     ],
-    "back": "mpk_root",
-    "back_label": "🔙 MPK Menu"
+    "back": "mpk_drums",
+    "back_label": "🔙 [D] Drums"
   },
   "mpk_cca": {
     "title": "🔴 <b>MPK Mini — CC Bank A (Live FX)</b>",
@@ -390,9 +392,13 @@
     "back_label": "🔙 MPK Menu"
   },
   "mpk_drums": {
-    "title": "🥁 <b>MPK Mini — 16 Drum Kits ([D] C#)</b>",
+    "title": "🥁 <b>MPK Mini — [D] Drums (16 Kits · C#)</b>",
     "layout": "1col",
     "items": [
+      {
+        "label": "🥁 Standard Pad Map (Kick, Snare, Hats…)",
+        "goto": "mpk_pads"
+      },
       {
         "label": "Pad 1 · A: Acoustic (0) | B: Room Rock (8)",
         "popup": "🥁 [D] (C#) + Pad 1 (Hold: 0.45s)\n• Bank A: Standard Acoustic Drum Kit (0)\n• Bank B: Room Rock & Gated Kit (8)"
@@ -815,7 +821,7 @@
     "items": [
       {
         "label": "Bluetooth Auto-Reconnect & Chimes",
-        "popup": "📶 Bluetooth & USB\n• Managed by ✨ PAD + 📶 Bluetooth services. Plays rising C5–E5–G5 arpeggio on connect, falling G5–E5–C5 on disconnect."
+        "popup": "📶 Bluetooth Coupled to ✨ PAD\n• Turning ✨ PAD ON/OFF in ⚙️ Services automatically enables/disables Bluetooth reconnect. Plays rising C5–E5–G5 chime on connect."
       },
       {
         "label": "1 cm² Corner Deadzones (Zero False Notes)",
@@ -827,7 +833,7 @@
       },
       {
         "label": "Save Trackpad Battery via Services",
-        "popup": "🔋 Power Control\n• Open ⚙️ Services on /start to toggle ✨ PAD or 📶 Bluetooth OFF persistently when not using the Trackpad."
+        "popup": "🔋 Power Control\n• Open ⚙️ Services on /start and toggle ✨ PAD OFF to stop both the MPE synth and Bluetooth polling together."
       }
     ],
     "back": "pad_root",

@@ -172,6 +172,7 @@
       <div class="pill" id="offline-pill">Offline App</div>
     </div>
     <div id="btn-container"></div>
+    <div id="bottom-rows-container"></div>
     <div id="back-container"></div>
   </div>
 
@@ -206,16 +207,15 @@
       box.className = page.layout === "3col" ? "grid-3" : (page.layout === "2col" ? "grid-2" : "grid-1");
       box.innerHTML = "";
 
-      (page.items || []).forEach((it) => {
-        if (it.pdf) {
+      const makeEl = (it) => {
+        if (it.pdf || it.url) {
           const a = document.createElement("a");
           a.className = "tg-btn";
-          a.href = it.pdf;
+          a.href = it.pdf || it.url;
           a.target = "_blank";
           a.rel = "noopener";
           a.textContent = it.label;
-          box.appendChild(a);
-          return;
+          return a;
         }
         const b = document.createElement("button");
         b.className = "tg-btn";
@@ -224,7 +224,19 @@
           if (it.popup) showPopup(it.popup);
           else if (it.goto) render(it.goto);
         };
-        box.appendChild(b);
+        return b;
+      };
+
+      (page.items || []).forEach((it) => box.appendChild(makeEl(it)));
+
+      const botRowsBox = document.getElementById("bottom-rows-container");
+      botRowsBox.innerHTML = "";
+      (page.bottom_rows || []).forEach((row) => {
+        const rDiv = document.createElement("div");
+        rDiv.className = row.length === 3 ? "grid-3" : (row.length === 2 ? "grid-2" : "grid-1");
+        rDiv.style.marginTop = "10px";
+        row.forEach((it) => rDiv.appendChild(makeEl(it)));
+        botRowsBox.appendChild(rDiv);
       });
 
       const backBox = document.getElementById("back-container");

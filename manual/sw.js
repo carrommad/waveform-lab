@@ -1,4 +1,4 @@
-const CACHE_NAME = "synth-guide-v3";
+const CACHE_NAME = "synth-guide-v4";
 const ASSETS = [
   "./",
   "./index.html",
