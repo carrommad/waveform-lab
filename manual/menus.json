@@ -34,12 +34,28 @@
     "layout": "2col",
     "items": [
       {
-        "label": "🎛️ 8 Knobs",
-        "goto": "mpk_knobs"
+        "label": "🎹 [K] Keys",
+        "goto": "mpk_sets"
       },
       {
-        "label": "🥁 Drum Pads",
-        "goto": "mpk_pads"
+        "label": "🥁 [D] Drums",
+        "goto": "mpk_drums"
+      },
+      {
+        "label": "🔁 [L] Looper",
+        "goto": "mpk_looper"
+      },
+      {
+        "label": "📻 [P] Presets",
+        "goto": "mpk_presets"
+      },
+      {
+        "label": "🎲 [R] Random",
+        "goto": "mpk_random"
+      },
+      {
+        "label": "🎵 [S] Songs",
+        "goto": "mpk_songs"
       },
       {
         "label": "🔴 CC Bank A",
@@ -50,24 +66,12 @@
         "goto": "mpk_ccb"
       },
       {
-        "label": "🔁 8-Trk Looper",
-        "goto": "mpk_looper"
+        "label": "🎛️ 8 Knobs",
+        "goto": "mpk_knobs"
       },
       {
-        "label": "📻 16 Presets",
-        "goto": "mpk_presets"
-      },
-      {
-        "label": "🎼 8 Key Sets",
-        "goto": "mpk_sets"
-      },
-      {
-        "label": "🥁 16 Drum Kits",
-        "goto": "mpk_drums"
-      },
-      {
-        "label": "🎵 [S] Songs",
-        "goto": "mpk_songs"
+        "label": "🥁 Drum Pads",
+        "goto": "mpk_pads"
       },
       {
         "label": "❓ Live Q&A",
@@ -322,7 +326,7 @@
     "back_label": "🔙 MPK Menu"
   },
   "mpk_sets": {
-    "title": "🎼 <b>MPK Mini — 8 Key Sets ([K] C) &amp; [R]</b>",
+    "title": "🎹 <b>MPK Mini — [K] Keys (8 Sets · C)</b>",
     "layout": "1col",
     "items": [
       {
@@ -356,10 +360,30 @@
       {
         "label": "Set 8 ([K]+P8) · Ambient Drones & Choirs",
         "popup": "🌌 Set 8 — Ambient Drones (Hold [K]+Pad 8: 0.45s)\n• 24 sounds: Deep Space Drone, Bowed Glass, Halo Pad, Ethereal Choir, Ice Rain, Slow Strings & Cavern Echoes."
+      }
+    ],
+    "back": "mpk_root",
+    "back_label": "🔙 MPK Menu"
+  },
+  "mpk_random": {
+    "title": "🎲 <b>MPK Mini — [R] Random (16 Slots · E)</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Recall Slot · Hold [R] E + Pad 1–8 (0.45s)",
+        "popup": "🎲 Load Saved Random Slot\n• Hold [R] (E) + Pad 1–8 for 0.45s (1 wood tick): loads that slot's saved Keyboard Sound + Drum Kit pair (Bank A: 1–8, Bank B: 9–16)."
       },
       {
-        "label": "🎲 [R] (E) + Pad 1–8 · 16 Random Slots",
-        "popup": "🎲 [R] (E) + Pad 1–8 (Bank A/B = 16 Slots)\n• Hold: 0.45s recalls saved Key+Drum pair (1 tick).\n• Hold: 1.5s re-rolls both sounds in that slot (3 rising ticks)."
+        "label": "Re-Roll Slot · Hold [R] E + Pad 1–8 (1.5s)",
+        "popup": "🎰 Re-Roll Single Slot\n• Hold [R] (E) + Pad 1–8 for 1.5s (3 rising wood ticks): picks a brand-new random Keyboard (1/192) + Drum Kit (1/16) in that slot."
+      },
+      {
+        "label": "Re-Roll All 16 · CC Bank B Pad 7 (Hold: 0.45s)",
+        "popup": "🔄 Refresh Entire [R] Bank\n• In CC Bank B (green LED, no key), Hold: Pad 7 for 0.45s to regenerate all 16 random slots at once."
+      },
+      {
+        "label": "Voice Lock Safe · Never Alters Active Loops",
+        "popup": "🔒 Loop Protection\n• Switching or re-rolling [R] slots changes your live keys & pads without altering already-recorded Looper tracks (unless Re-Voice is on)."
       }
     ],
     "back": "mpk_root",
@@ -791,7 +815,7 @@
     "items": [
       {
         "label": "Bluetooth Auto-Reconnect & Chimes",
-        "popup": "📶 Bluetooth & USB\n• Managed by PAD Synth (magicpad) + PAD BT (bt-trackpad). Plays rising C5–E5–G5 arpeggio on connect, falling G5–E5–C5 on disconnect."
+        "popup": "📶 Bluetooth & USB\n• Managed by ✨ PAD + 📶 Bluetooth services. Plays rising C5–E5–G5 arpeggio on connect, falling G5–E5–C5 on disconnect."
       },
       {
         "label": "1 cm² Corner Deadzones (Zero False Notes)",
@@ -803,7 +827,7 @@
       },
       {
         "label": "Save Trackpad Battery via Services",
-        "popup": "🔋 Power Control\n• Open ⚙️ Services in /synth to toggle ✨ PAD Synth or 📶 PAD BT OFF persistently when not using the Trackpad."
+        "popup": "🔋 Power Control\n• Open ⚙️ Services on /start to toggle ✨ PAD or 📶 Bluetooth OFF persistently when not using the Trackpad."
       }
     ],
     "back": "pad_root",
