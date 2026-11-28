@@ -1879,6 +1879,15 @@ function initMidiTelemetry() {
     .then(data => {
       if (!data || !data.online) return;
 
+      if (data.hostname) {
+        const hostBadge = document.getElementById("hostBadge");
+        if (hostBadge) {
+          hostBadge.textContent = data.hostname;
+          hostBadge.style.display = "inline-block";
+        }
+        document.title = `Waveform Lab · ${data.hostname}`;
+      }
+
       // Reveal header toggle switch on host/VPN
       if (headerToggleCard) headerToggleCard.style.display = "flex";
 

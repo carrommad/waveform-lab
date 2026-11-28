@@ -148,15 +148,15 @@ def _parse_and_route_line(unit: str, msg: str):
 
     elif dev == "apc":
         if "APC40 MODE" in clean:
-            match = re.search(r"MODE \d+:\s*(.+?)(?:\s*\(|\s*$)", clean)
+            match = re.search(r"MODE \d+:\s*([^\]]+)", clean)
             if match:
                 status_update = f"Mode: {match.group(1).strip()}"
         elif "DRUM KIT" in clean:
             match = re.search(r"->\s*(.+?)$", clean)
             if match:
                 status_update = f"Drums: {match.group(1).strip()}"
-        elif "METRONOME" in clean or "TAP TEMPO" in clean:
-            match = re.search(r"(\d+)\s*BPM", clean)
+        elif "METRONOME" in clean or "TAP TEMPO" in clean or "TEMPO E10" in clean or "NUDGE BPM" in clean:
+            match = re.search(r"(\d+(?:\.\d+)?)\s*BPM", clean)
             if match:
                 status_update = f"Tempo: {match.group(1)} BPM"
 
@@ -291,6 +291,7 @@ class MidiStreamHandler(SimpleHTTPRequestHandler):
             with _lock:
                 state = {
                     "online": True,
+                    "hostname": socket.gethostname(),
                     "status": dict(_status),
                     "logs": {dev: list(_history[dev]) for dev in _history},
                 }
