@@ -1,0 +1,812 @@
+{
+  "synth_hub": {
+    "title": "🎹 <b>Synth Station Guide</b>",
+    "layout": "3col",
+    "items": [
+      {
+        "label": "🎹 MPK",
+        "goto": "mpk_root"
+      },
+      {
+        "label": "🎛️ APC40",
+        "goto": "apc_root"
+      },
+      {
+        "label": "✨ PAD",
+        "goto": "pad_root"
+      },
+      {
+        "label": "📄 PDF MPK",
+        "pdf": "pdfs/Manual_Instrucciones_Akai_MPK_Mini.pdf"
+      },
+      {
+        "label": "📄 PDF APC",
+        "pdf": "pdfs/Manual_Instrucciones_Akai_APC40_MKII.pdf"
+      },
+      {
+        "label": "📄 PDF PAD",
+        "pdf": "pdfs/Manual_Instrucciones_Magic_Trackpad.pdf"
+      }
+    ]
+  },
+  "mpk_root": {
+    "title": "🎹 <b>Akai MPK Mini MK3</b>",
+    "layout": "2col",
+    "items": [
+      {
+        "label": "🎛️ 8 Knobs",
+        "goto": "mpk_knobs"
+      },
+      {
+        "label": "🥁 Drum Pads",
+        "goto": "mpk_pads"
+      },
+      {
+        "label": "🔴 CC Bank A",
+        "goto": "mpk_cca"
+      },
+      {
+        "label": "🟢 CC Bank B",
+        "goto": "mpk_ccb"
+      },
+      {
+        "label": "🔁 8-Trk Looper",
+        "goto": "mpk_looper"
+      },
+      {
+        "label": "📻 16 Presets",
+        "goto": "mpk_presets"
+      },
+      {
+        "label": "🎼 8 Key Sets",
+        "goto": "mpk_sets"
+      },
+      {
+        "label": "🥁 16 Drum Kits",
+        "goto": "mpk_drums"
+      },
+      {
+        "label": "🎵 [S] Songs",
+        "goto": "mpk_songs"
+      },
+      {
+        "label": "❓ Live Q&A",
+        "goto": "mpk_qa"
+      },
+      {
+        "label": "📄 PDF MPK",
+        "pdf": "pdfs/Manual_Instrucciones_Akai_MPK_Mini.pdf"
+      }
+    ],
+    "back": "synth_hub",
+    "back_label": "🔙 Synth Hub"
+  },
+  "mpk_knobs": {
+    "title": "🎛️ <b>MPK Mini — 8 Knobs</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "K1 · Drum Reverb (Snare & Cymbals)",
+        "popup": "🎛️ K1 (Top 1) — Drum Reverb\n• Sends reverb (CC 91) to live drums, percussion loops & [P] presets (Ch 9, 16–24), independent from Keys Reverb K5."
+      },
+      {
+        "label": "K2 · Drum Pitch (-12 to +12 st)",
+        "popup": "🎛️ K2 (Top 2) — Drum Pitch\n• Continuous pitch tuning (-12 to +12 semitones) across all drum channels, from deep 808 sub to high jungle."
+      },
+      {
+        "label": "K3 · Tempo (30–210 BPM, 1 BPM step)",
+        "popup": "🎛️ K3 (Top 3) — Looper & Preset Tempo\n• Exact 1 BPM steps centered on active tempo (120 BPM default). Rescales active loops smoothly without drift."
+      },
+      {
+        "label": "K4 · Drum & Loops Volume (0–127)",
+        "popup": "🎛️ K4 (Top 4) — Drum Volume\n• PLAYING: scales live drums + drum loops proportionally down to 0%.\n• ARMED/OVERDUB: freezes prior layers to set new layer balance."
+      },
+      {
+        "label": "K5 · Keys Reverb (Room & Level)",
+        "popup": "🎛️ K5 (Bottom 1) — Keys Reverb\n• Controls cathedral room size & reverb send (CC 91) on live keys (Ch 0) and melodic loop tracks."
+      },
+      {
+        "label": "K6 · Keys Chorus (Stereo Width)",
+        "popup": "🎛️ K6 (Bottom 2) — Keys Chorus\n• Lush Roland Juno-style stereo chorus depth & level (CC 93) on live keys and melodic loop tracks."
+      },
+      {
+        "label": "K7 · Decay (Sust ON) / Rotary (OFF)",
+        "popup": "🎛️ K7 (Bottom 3) — Dual Mode\n• Sustain ON: decay tail (1–60s pianos, 1–35s organs).\n• Sustain OFF: Leslie rotary vibrato speed (0.2–5.0 Hz)."
+      },
+      {
+        "label": "K8 · Keys & Melodic Volume (0–127)",
+        "popup": "🎛️ K8 (Bottom 4) — Keys Volume\n• PLAYING: scales live keys + melodic loops proportionally.\n• ARMED/OVERDUB: freezes prior tracks to set new track level."
+      },
+      {
+        "label": "🎵 When [S] Songs Play: K1–K8 Faders",
+        "popup": "🎵 Automatic [S] Song Faders\n• While ≥1 [S] song plays, K1–K4 = Vol Pads 5–8 and K5–K8 = Vol Pads 1–4. Stopping all [S] songs restores normal knob FX."
+      }
+    ],
+    "back": "mpk_root",
+    "back_label": "🔙 MPK Menu"
+  },
+  "mpk_pads": {
+    "title": "🥁 <b>MPK Mini — Standard Drum Pads</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Bank A (1–4) · Kick | Stick | Snare | Clap",
+        "popup": "🥁 Drum Pads Bank A (Bottom Row)\n• Pad 1: Kick (36) | Pad 2: Side Stick (37)\n• Pad 3: Snare (38) | Pad 4: Hand Clap (39)\n• 60ms per-pad anti-bounce filter."
+      },
+      {
+        "label": "Bank A (5–8) · E-Snare | FlrTom | Hat | Tom",
+        "popup": "🥁 Drum Pads Bank A (Top Row)\n• Pad 5: Electric Snare (40) | Pad 6: Floor Tom (41)\n• Pad 7: Closed Hi-Hat (42) | Pad 8: Mid Tom (43)"
+      },
+      {
+        "label": "Bank B (1–4) · PedHat | LoTom | OpHat | Tom",
+        "popup": "🥁 Drum Pads Bank B (Bottom Row)\n• Pad 1: Pedal Hat (44) | Pad 2: Low Tom (45)\n• Pad 3: Open Hi-Hat (46) | Pad 4: Mid-Low Tom (47)"
+      },
+      {
+        "label": "Bank B (5–8) · HiTom | Crash | Tom | Ride",
+        "popup": "🥁 Drum Pads Bank B (Top Row)\n• Pad 5: Hi-Mid Tom (48) | Pad 6: Crash Cymbal (49)\n• Pad 7: High Tom (50) | Pad 8: Ride Cymbal (51)"
+      },
+      {
+        "label": "🥁 Browse 16 Drum Kits ([D] C# + Pad)",
+        "goto": "mpk_drums"
+      }
+    ],
+    "back": "mpk_root",
+    "back_label": "🔙 MPK Menu"
+  },
+  "mpk_cca": {
+    "title": "🔴 <b>MPK Mini — CC Bank A (Live FX)</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Pad 1 · Sustain (Tap: Latch / Hold: Pedal)",
+        "popup": "🎹 Pad 1 — Sustain (CC 64)\n• Tap (<0.45s): Toggles Sustain ON/OFF (stays on).\n• Hold (≥0.45s): Momentary damper pedal (turns OFF when you release)."
+      },
+      {
+        "label": "Pad 2 · Glide (Tap: Latch / Hold: Moment.)",
+        "popup": "🎹 Pad 2 — Portamento / Glide\n• Tap (<0.45s): Toggles smooth pitch slide ON/OFF.\n• Hold (≥0.45s): Momentary glide active only while held."
+      },
+      {
+        "label": "Pad 3 · Harmonic Fifth (Tap: +7 st)",
+        "popup": "🎹 Pad 3 — Harmonic Fifth (+7 st)\n• Tap: Toggles instant power chords, doubling every note you play with its perfect fifth (+7 semitones)."
+      },
+      {
+        "label": "Pad 4 · Reverb Kill (Hold: Mute Reverb)",
+        "popup": "🔇 Pad 4 — Reverb Kill\n• Hold: Mutes all keyboard reverb while held for an instant dry sound.\n• Release: Restores K5 reverb immediately."
+      },
+      {
+        "label": "Pad 5 · Chorus Boost (Hold: Extra Width)",
+        "popup": "🌊 Pad 5 — Chorus Splash\n• Hold: Injects wide spatial chorus boost while held.\n• Release: Returns smoothly to your K6 chorus setting."
+      },
+      {
+        "label": "Pad 6 · ◀ Prev Sound (Hold: Prev Set)",
+        "popup": "◀ Pad 6 — Previous Sound / Set\n• Tap (<0.45s): Previous instrument in active set (1–24).\n• Hold (≥0.45s): Previous melodic set (1–8) with audio preview."
+      },
+      {
+        "label": "Pad 7 · Next Sound ▶ (Hold: Next Set)",
+        "popup": "▶ Pad 7 — Next Sound / Set\n• Tap (<0.45s): Next instrument in active set (1–24).\n• Hold (≥0.45s): Next melodic set (1–8) with audio preview."
+      },
+      {
+        "label": "Pad 8 · 🛑 Panic (Tap: Instant Stop All)",
+        "popup": "🛑 Pad 8 — Total Panic (Instant)\n• Tap: Cuts all notes & reverb immediately, stops [S] Songs & [P] Preset, and pauses Looper without erasing tracks."
+      },
+      {
+        "label": "🎹 Pads 6+7 · 24-Key Picker (Hold: 1.5s)",
+        "popup": "🎹 Pads 6+7 — 24-Key Picker\n• Hold both 1.5s: Use the 24 piano keys to audition & pick any sound in the active Set (5s window, +3s per key)."
+      },
+      {
+        "label": "🟢 Switch to CC Bank B (System)",
+        "goto": "mpk_ccb"
+      }
+    ],
+    "back": "mpk_root",
+    "back_label": "🔙 MPK Menu"
+  },
+  "mpk_ccb": {
+    "title": "🟢 <b>MPK Mini — CC Bank B (System)</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Pad 1 · Full Key Vol (Tap: Fixed 127)",
+        "popup": "🔊 CC Bank B · Pad 1 (Instant)\n• Tap: Toggles fixed maximum key velocity (127) vs natural dynamic touch curve (2 woodblock ticks)."
+      },
+      {
+        "label": "Pad 2 · Performance Lock (Tap: Lock UI)",
+        "popup": "🔒 CC Bank B · Pad 2 (Instant)\n• Tap: Locks [K..S] & CC Bank B menus and mutes UI chimes for live stage safety. Tap Pad 2 again to unlock."
+      },
+      {
+        "label": "Pad 3 · Arp Sync BPM (Tap: Auto-BPM)",
+        "popup": "⏱ CC Bank B · Pad 3 (Instant)\n• Tap: Toggles automatic Looper BPM detection when playing 8+ hardware Arpeggiator notes."
+      },
+      {
+        "label": "Pad 4 · Session Record (Tap: REC / STOP)",
+        "popup": "🎙️ CC Bank B · Pad 4 (Instant)\n• Tap: Starts/stops full audio+MIDI session recording (.flac, .mp3, .json, .mid) & sends MP3 to Telegram."
+      },
+      {
+        "label": "Pad 5 · Equalize Volumes (Hold: 0.45s)",
+        "popup": "🎚️ CC Bank B · Pad 5\n• Hold: 0.45s — Resets active [S] Songs + Looper tracks (or Looper + Preset) to 100% balanced volume."
+      },
+      {
+        "label": "Pad 6 · Reset FX Only (Hold: 0.45s)",
+        "popup": "✨ CC Bank B · Pad 6\n• Hold: 0.45s — Resets Reverb, Chorus, Drum Pitch, Sustain, Glide & +5th without stopping playback."
+      },
+      {
+        "label": "Pad 7 · Re-Roll All [R] (Hold: 0.45s)",
+        "popup": "🎲 CC Bank B · Pad 7\n• Hold: 0.45s — Regenerates all 16 [R] random slots with fresh Keyboard + Drum Kit combinations."
+      },
+      {
+        "label": "Pad 8 · Factory Reset (Hold: 1.5s)",
+        "popup": "♻️ CC Bank B · Pad 8\n• Hold: 1.5s — Clears 8 Looper tracks, stops [P] & [S] (keeps saved disk files), restores Piano Set 4 & 120 BPM."
+      },
+      {
+        "label": "🔴 Switch to CC Bank A (Live FX)",
+        "goto": "mpk_cca"
+      }
+    ],
+    "back": "mpk_root",
+    "back_label": "🔙 MPK Menu"
+  },
+  "mpk_looper": {
+    "title": "🔁 <b>MPK Mini — 8-Track Looper ([L] D)</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Pad 1 · Rec / Overdub (Hold: 0.45s)",
+        "popup": "🔴 [L] + Pad 1 — Record & Overdub\n• Hold: 0.45s arms Rec (IDLE) or Overdub (PLAYING; in PAUSED records solo w/ click).\n• Tap in REC: closes free take.\n• Hold: 1.5s resets Free Mode."
+      },
+      {
+        "label": "Bars 1–8 · Keep [L] Held + Tap Pad 1–8",
+        "popup": "📏 Fixed 1–8 Bars Selection\n• Right after [L]+Pad 1 tick, keep [L] held and Tap: Pad 1–8 for 1–8 bars (plays N wood clicks & auto-closes).\n• Hold: 1.5s locks bar length."
+      },
+      {
+        "label": "Pad 2 · Re-Voice Track (Hold: 0.45s / 1.5s)",
+        "popup": "🎨 [L] + Pad 2 — Targeted Re-Voice\n• Hold: 0.45s+release auditions new sounds on last track (keep [L] + Tap: P5–8 picks tracks, P4=All).\n• Hold: 1.5s locks new voices."
+      },
+      {
+        "label": "Pad 3 · Metronome (0.45s) / Bake (1.5s)",
+        "popup": "💾 [L] + Pad 3 — Click / Bake Song\n• Hold: 0.45s+release toggles Metronome.\n• Hold: 1.5s bakes unmuted tracks to [S] Songs (release [L]=free slot; +Pad 1–8=target slot)."
+      },
+      {
+        "label": "Pad 4 · Play/Pause (0.45s) / Clear (1.5s)",
+        "popup": "⏯ [L] + Pad 4 — Transport & Clear All\n• Hold: 0.45s+release toggles global Play / Pause.\n• Hold: 1.5s clears all 8 tracks ([P] Preset keeps playing)."
+      },
+      {
+        "label": "Pads 5–8 (Bank A) · Tracks 1–4 Mute/Del",
+        "popup": "🎚️ [L] + Pads 5–8 (Bank A = Tracks 1–4)\n• Hold: 0.45s+release Mutes / Unmutes that track.\n• Hold: 1.5s deletes only that track."
+      },
+      {
+        "label": "Pads 5–8 (Bank B) · Tracks 5–8 Mute/Del",
+        "popup": "🎚️ [L] + Pads 5–8 (Bank B = Tracks 5–8)\n• Hold: 0.45s+release Mutes / Unmutes that track.\n• Hold: 1.5s deletes only that track."
+      }
+    ],
+    "back": "mpk_root",
+    "back_label": "🔙 MPK Menu"
+  },
+  "mpk_presets": {
+    "title": "📻 <b>MPK Mini — 16 Beat Presets ([P] D#)</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Pad 1 · A: Lo-Fi (76) | B: Tekno (150)",
+        "popup": "📻 [P] (D#) + Pad 1 (Hold: 0.45s)\n• Bank A: Lo-Fi Chill (76 BPM)\n• Bank B: Tribe Tekno (150 BPM)\n• Repeat [P]+Pad to stop; K3 adjusts BPM."
+      },
+      {
+        "label": "Pad 2 · A: Boom-Bap (88) | B: Rumba (102)",
+        "popup": "📻 [P] (D#) + Pad 2 (Hold: 0.45s)\n• Bank A: 90s Boom-Bap Hip-Hop (88 BPM)\n• Bank B: Rumba Catalana / Flamenca (102 BPM)"
+      },
+      {
+        "label": "Pad 3 · A: Trap 808 (138) | B: Bulerías (180)",
+        "popup": "📻 [P] (D#) + Pad 3 (Hold: 0.45s)\n• Bank A: Trap 808 Rolls (138 BPM)\n• Bank B: Bulerías Compás (180 BPM)"
+      },
+      {
+        "label": "Pad 4 · A: House (124) | B: Dembow (95)",
+        "popup": "📻 [P] (D#) + Pad 4 (Hold: 0.45s)\n• Bank A: Deep House 4x4 (124 BPM)\n• Bank B: Reggaeton Dembow (95 BPM)"
+      },
+      {
+        "label": "Pad 5 · A: Pop/Rock (104) | B: DnB (174)",
+        "popup": "📻 [P] (D#) + Pad 5 (Hold: 0.45s)\n• Bank A: Pop / Indie Rock (104 BPM)\n• Bank B: Liquid Drum & Bass (174 BPM)"
+      },
+      {
+        "label": "Pad 6 · A: Neo-Soul (94) | B: Bossa (128)",
+        "popup": "📻 [P] (D#) + Pad 6 (Hold: 0.45s)\n• Bank A: Dilla Neo-Soul Pocket (94 BPM)\n• Bank B: Brazilian Bossa Nova (128 BPM)"
+      },
+      {
+        "label": "Pad 7 · A: Jazz (118) | B: Synthwave (115)",
+        "popup": "📻 [P] (D#) + Pad 7 (Hold: 0.45s)\n• Bank A: Jazz Ride Swing (118 BPM)\n• Bank B: 80s Retro Synthwave (115 BPM)"
+      },
+      {
+        "label": "Pad 8 · A: Afrobeat (108) | B: Micro (122)",
+        "popup": "📻 [P] (D#) + Pad 8 (Hold: 0.45s)\n• Bank A: Afrobeat Poly-Groove (108 BPM)\n• Bank B: Minimal Microhouse (122 BPM)"
+      }
+    ],
+    "back": "mpk_root",
+    "back_label": "🔙 MPK Menu"
+  },
+  "mpk_sets": {
+    "title": "🎼 <b>MPK Mini — 8 Key Sets ([K] C) &amp; [R]</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Set 1 ([K]+P1) · Deep Basses & Acid 303",
+        "popup": "🎸 Set 1 — Deep Basses (Hold [K]+Pad 1: 0.45s)\n• 24 sounds: Sub 808, Finger/Picked/Fretless/Slap Bass, Synth Bass 1 & Acid TB-303, Contrabass (-36st full range)."
+      },
+      {
+        "label": "Set 2 ([K]+P2) · World & Ethnic Plucks",
+        "popup": "🌍 Set 2 — World & Ethnic (Hold [K]+Pad 2: 0.45s)\n• 24 sounds: Sitar, Koto, Shamisen, Kalimba, Marimba, Balafon, Pan Flute, Shakuhachi, Bagpipes & Steel Drums."
+      },
+      {
+        "label": "Set 3 ([K]+P3) · Analog Synths & Leads",
+        "popup": "🎹 Set 3 — Synths & Pads (Hold [K]+Pad 3: 0.45s)\n• 24 sounds: Square/Saw Leads, Polysynth, Synth Brass, Warm Analog Pad, Fifths Lead & Resonant Sweeps."
+      },
+      {
+        "label": "Set 4 ([K]+P4) · Pianos, Rhodes & Organs",
+        "popup": "🎹 Set 4 — Keys & Organs (Default, Hold [K]+Pad 4: 0.45s)\n• 24 sounds: Grand Piano, Bright/Honky-Tonk, Rhodes MK1, DX7 FM, Clavinet, Hammond B3, Pipe Organ & Accordion."
+      },
+      {
+        "label": "Set 5 ([K]+P5) · Guitars & Harps",
+        "popup": "🎸 Set 5 — Guitars & Plucks (Hold [K]+Pad 5: 0.45s)\n• 24 sounds: Spanish Nylon, Acoustic Steel, Jazz Archtop, Clean Strat, Muted/Overdriven/Distortion Guitar & Harp."
+      },
+      {
+        "label": "Set 6 ([K]+P6) · Orchestra, Brass & Winds",
+        "popup": "🎻 Set 6 — Orchestral (Hold [K]+Pad 6: 0.45s)\n• 24 sounds: Violin, Viola, Cello, Strings, Pizzicato, Trumpet, Miles Muted, French Horn, Saxes, Oboe, Clarinet & Flute."
+      },
+      {
+        "label": "Set 7 ([K]+P7) · Retro 8-Bit & Sci-Fi FX",
+        "popup": "👾 Set 7 — Retro 8-Bit & FX (Hold [K]+Pad 7: 0.45s)\n• 24 sounds: NES Pulse, GameBoy Saw, Chiptune, Crystal, Sci-Fi Raindrops, Ocean, Bird, Helicopter & Orch Hit."
+      },
+      {
+        "label": "Set 8 ([K]+P8) · Ambient Drones & Choirs",
+        "popup": "🌌 Set 8 — Ambient Drones (Hold [K]+Pad 8: 0.45s)\n• 24 sounds: Deep Space Drone, Bowed Glass, Halo Pad, Ethereal Choir, Ice Rain, Slow Strings & Cavern Echoes."
+      },
+      {
+        "label": "🎲 [R] (E) + Pad 1–8 · 16 Random Slots",
+        "popup": "🎲 [R] (E) + Pad 1–8 (Bank A/B = 16 Slots)\n• Hold: 0.45s recalls saved Key+Drum pair (1 tick).\n• Hold: 1.5s re-rolls both sounds in that slot (3 rising ticks)."
+      }
+    ],
+    "back": "mpk_root",
+    "back_label": "🔙 MPK Menu"
+  },
+  "mpk_drums": {
+    "title": "🥁 <b>MPK Mini — 16 Drum Kits ([D] C#)</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Pad 1 · A: Acoustic (0) | B: Room Rock (8)",
+        "popup": "🥁 [D] (C#) + Pad 1 (Hold: 0.45s)\n• Bank A: Standard Acoustic Drum Kit (0)\n• Bank B: Room Rock & Gated Kit (8)"
+      },
+      {
+        "label": "Pad 2 · A: 909 Dance (24) | B: TR-808 (25)",
+        "popup": "🥁 [D] (C#) + Pad 2 (Hold: 0.45s)\n• Bank A: Electronic 909 Dance Kit (24)\n• Bank B: Roland TR-808 Classic Trap (25)"
+      },
+      {
+        "label": "Pad 3 · A: Jazz Kit (32) | B: Brushes (40)",
+        "popup": "🥁 [D] (C#) + Pad 3 (Hold: 0.45s)\n• Bank A: Acoustic Jazz Sticks (32)\n• Bank B: Brush Drum Kit Escobillas (40)"
+      },
+      {
+        "label": "Pad 4 · A: Orchestra | B: Taiko & Gongs",
+        "popup": "🥁 [D] (C#) + Pad 4 (Hold: 0.45s)\n• Bank A: Orchestra Timpani & Percussion\n• Bank B: Cinematic Taiko & Asian Gongs"
+      },
+      {
+        "label": "Pad 5 · A: Afro Djembe | B: Cubano Batá",
+        "popup": "🥁 [D] (C#) + Pad 5 (Hold: 0.45s)\n• Bank A: Afro-Tribal Djembe & Dunun\n• Bank B: Afro-Cuban Batá & Shakers"
+      },
+      {
+        "label": "Pad 6 · A: Asian Taiko | B: Derbake & Riq",
+        "popup": "🥁 [D] (C#) + Pad 6 (Hold: 0.45s)\n• Bank A: East Asian Taiko & Temple Bells\n• Bank B: Middle Eastern Derbake & Riq"
+      },
+      {
+        "label": "Pad 7 · A: Salsa Congas | B: Samba Cuíca",
+        "popup": "🥁 [D] (C#) + Pad 7 (Hold: 0.45s)\n• Bank A: Latin Salsa Congas & Timbales\n• Bank B: Carnaval Samba, Whistles & Cuíca"
+      },
+      {
+        "label": "Pad 8 · A: Flamenco Cajón | B: Castañuelas",
+        "popup": "🥁 [D] (C#) + Pad 8 (Hold: 0.45s)\n• Bank A: Flamenco Cajón & Palmas 1\n• Bank B: Flamenco Castañuelas & Taconeo 2"
+      }
+    ],
+    "back": "mpk_root",
+    "back_label": "🔙 MPK Menu"
+  },
+  "mpk_songs": {
+    "title": "🎵 <b>MPK Mini — [S] Songs (16 Slots)</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Play / Stop Song · Hold [S] F + Pad (0.45s)",
+        "popup": "▶️ [S] (F) + Pad 1–8 (Bank A/B = 16 Slots)\n• Hold: 0.45s (1 soft wood tick) + release toggles layered Play/Stop quantized to Bar 1 on isolated Ch 32–127."
+      },
+      {
+        "label": "Random 1 Song · Hold [S] F + Pad (1.5s)",
+        "popup": "🎲 [S] (F) + Pad 1–8 (Hold: 1.5s)\n• Triple wood tick: loads a random saved song from disk library (patterns/) into that pad slot."
+      },
+      {
+        "label": "Bake from Looper · Hold [L] D + Pad 3 (1.5s)",
+        "popup": "💾 Bake Active Loop ([L] + Pad 3, Hold: 1.5s)\n• Saves unmuted Looper tracks + polyrhythms + FX to disk without clearing Looper. Release [L]=free slot; +P1–8=pick slot."
+      },
+      {
+        "label": "Symmetric Faders · K1–K4 (P5–8) / K5–K8 (P1–4)",
+        "popup": "🎚️ Auto Knob Faders\n• Whenever ≥1 [S] song is playing, K1–K4 control volume of Pads 5–8 and K5–K8 control Pads 1–4 in the active bank (e.g. Pad 3 ↔ K7)."
+      }
+    ],
+    "back": "mpk_root",
+    "back_label": "🔙 MPK Menu"
+  },
+  "mpk_qa": {
+    "title": "❓ <b>MPK Mini — Live Q&amp;A</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Universal Timing Rule (0s / 0.45s / 1.5s)",
+        "popup": "⏱ 3 Timing Levels\n• Tap (0s): CC A 1–5/8, CC B 1–4, close REC.\n• Hold: 0.45s: All [K..S] menus (1 tick + release), CC B 5–7.\n• Hold: 1.5s: Delete/Clear/Bake/Random/Reset."
+      },
+      {
+        "label": "Record 4-Bar Overdub over 2-Bar Loop",
+        "popup": "🔁 Polyrhythmic Overdub\n1) Hold [L]+Pad 1 (0.45s tick).\n2) Keep [L] held + Tap: Pad 4 (4 clicks = 4 bars).\n3) Release [L]: records 4 synced bars & auto-closes."
+      },
+      {
+        "label": "Solo Overdub Starting from PAUSED",
+        "popup": "🎧 Silent Solo Overdub\n• From PAUSED, Hold [L]+Pad 1 (0.45s): records w/ click while prior tracks stay muted, then plays ONLY the new track until unmuted ([L]+P5–8)."
+      },
+      {
+        "label": "Change Instrument on Only 1 Loop Track",
+        "popup": "🎨 Targeted Re-Voice\n• Hold [L]+Pad 2 (0.45s) & release Pad 2 while holding [L], then Tap: Pads 5–8 to toggle tracks 1–8 (Pad 4=All). Hold [L]+Pad 2 (1.5s) to lock."
+      },
+      {
+        "label": "Stop Everything Without Losing My Loop",
+        "popup": "🛑 Safe Stage Stop\n• In CC Bank A, Tap: Pad 8 (Panic): cuts all notes/reverb & stops [S] Songs immediately while keeping your loop safe in PAUSED."
+      },
+      {
+        "label": "Mix Different Volumes per Loop Layer",
+        "popup": "🎚️ Per-Layer Balance\n• Arm Overdub ([L]+Pad 1) first, then turn K8 (keys) or K4 (drums): prior tracks freeze while you set the new layer's relative level."
+      },
+      {
+        "label": "Why Turn Hardware ARP Button OFF for Menus",
+        "popup": "⚠️ Hardware ARP Rule\n• With ARP ON, holding a key sends short note pulses that cancel the 0.45s hold timer. Turn ARP OFF before opening [K..S] menus."
+      }
+    ],
+    "back": "mpk_root",
+    "back_label": "🔙 MPK Menu"
+  },
+  "apc_root": {
+    "title": "🎛️ <b>Akai APC40 mkII</b>",
+    "layout": "2col",
+    "items": [
+      {
+        "label": "🎛️ 8 Modes (M1–M8)",
+        "goto": "apc_modes"
+      },
+      {
+        "label": "🎚️ Mixer & Looper",
+        "goto": "apc_mixer"
+      },
+      {
+        "label": "✨ Global & M8 FX",
+        "goto": "apc_fx"
+      },
+      {
+        "label": "🚀 Sessions & SHIFT",
+        "goto": "apc_transport"
+      },
+      {
+        "label": "📂 Samples & Q&A",
+        "goto": "apc_qa"
+      },
+      {
+        "label": "📄 PDF APC40",
+        "pdf": "pdfs/Manual_Instrucciones_Akai_APC40_MKII.pdf"
+      }
+    ],
+    "back": "synth_hub",
+    "back_label": "🔙 Synth Hub"
+  },
+  "apc_modes": {
+    "title": "🎛️ <b>APC40 — 8 Action Modes (M1–M8)</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "M1 · Samples 1 (Hits, Brass, SFX, Drops)",
+        "popup": "🟠 M1 — Samples 1 (Ch 28)\n• 5 banks (A–E / ◄►). Plays .wav/.mp3/.ogg/.flac from samples/m1/ (BANK = Pads 41–80) or built-in SoundFont hits/stabs."
+      },
+      {
+        "label": "M2 · Samples 2 (Choirs, Pads, Kalimba)",
+        "popup": "🔵 M2 — Samples 2 (Ch 29)\n• 5 banks (Vocal Chops, Ambient Pads, Bells/Kalimba, World, Arps). Plays samples/m2/ audio or SoundFont textures."
+      },
+      {
+        "label": "M3 · Drums (40 Pads · 6 Drum Kits)",
+        "popup": "🔴 M3 — Drum Station (Ch 25 Bank 128)\n• 6 Kits via A–E / ◄► (Acoustic, TR-808, 909, Rock, Jazz, Orchestral). 40 pads grouped by Kick/Snare, Toms/Hats, Cymbals & Perc."
+      },
+      {
+        "label": "M4 · Synths (4ths Grid · 10 Presets)",
+        "popup": "🟣 M4 — Synthesizers (Ch 6)\n• 10 presets (Square, Saw, Sub, Warm Pad, Acid 303…). Isomorphic 4ths grid (+5st row / +1st col). ▲▼ shifts octave (-2..+2)."
+      },
+      {
+        "label": "M5 · Strings & Guitars (10 Presets)",
+        "popup": "🟢 M5 — Strings (Ch 5)\n• 10 presets (Ensemble, Slow Strings, Pizzicato, Violin, Cello, Harp, Nylon Guitar, Sitar). Root C pads glow white."
+      },
+      {
+        "label": "M6 · Pianos & Organs (10 Presets)",
+        "popup": "🔵 M6 — Pianos & Keys (Ch 3)\n• 10 presets (Yamaha Grand, Rhodes MK1, DX7, Hammond B3, Clavinet, Vibraphone, Pipe Organ)."
+      },
+      {
+        "label": "M7 · World & Latin Percussion (5 Kits)",
+        "popup": "🟠 M7 — World Percussion (Ch 31 Bank 128)\n• 5 ethnic/Latin kits isolated from M3 (Samba, Shakers, Wood/Flamenco, Congas/Timbales, Taiko/Gongs)."
+      },
+      {
+        "label": "M8 · 40 Live Channel FX Pads",
+        "popup": "🔴 M8 — Live Channel FX\n• 40 RGB FX pads acting ONLY on currently sounding APC40 channels.\n• F8: Wet depth | R8: Latch ON/OFF | B8: Clear all M8 FX."
+      }
+    ],
+    "back": "apc_root",
+    "back_label": "🔙 APC40 Menu"
+  },
+  "apc_mixer": {
+    "title": "🎚️ <b>APC40 — DJ Mixer &amp; 7-Ch Looper</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Faders F1–F7 Vol | F8 M8 Wet | F9 Master",
+        "popup": "🎚️ Vertical Faders\n• F1–F7: Channel volume for M1–M7.\n• F8: Wet intensity for M8 FX.\n• F9: APC40 Master volume (never affects MPK or Trackpad)."
+      },
+      {
+        "label": "F10 Crossfader + A|B Assign (×7)",
+        "popup": "🎛️ DJ Crossfader\n• F10 blends Deck A ↔ Deck B (center = 100% both).\n• Tap: A|B button per channel to cycle A (Yellow), B (Orange), or Thru (Off)."
+      },
+      {
+        "label": "R1–R7 · Record / Overdub (SHIFT: Undo)",
+        "popup": "🔴 R1–R7 — Per-Channel Looper\n• Tap: Record / Close Loop / Overdub synced to BPM (includes custom WAV/MP3 samples).\n• Hold SHIFT + Tap R1–R7: Undo last layer."
+      },
+      {
+        "label": "B1–B7 · Stop / Resume (SHIFT: Clear)",
+        "popup": "🟧 B1–B7 — Channel Loop Stop\n• Tap: Stops or resumes that channel's loop in phase.\n• Hold SHIFT + Tap B1–B7: Deletes that channel's loop completely."
+      },
+      {
+        "label": "Buttons 1–8 Mute | S Solo",
+        "popup": "🔇 Mute & Solo\n• Buttons 1–8 (Orange = Active): Mute/Unmute channel (Ch 8 toggles M8 FX).\n• S Buttons (Blue): Isolate Solo channel(s)."
+      },
+      {
+        "label": "Top Knobs E1–E8 · Pan / Sends / Filter",
+        "popup": "⭕ Channel Strip Rings E1–E8\n• PAN mode: stereo pan (SHIFT+PAN centers all).\n• SENDS: Reverb/Chorus send.\n• Hold SHIFT + Tap USER: per-channel Filter Cutoff."
+      }
+    ],
+    "back": "apc_root",
+    "back_label": "🔙 APC40 Menu"
+  },
+  "apc_fx": {
+    "title": "✨ <b>APC40 — Global &amp; M8 Live FX</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Global E11–E14 · Cutoff, Res, Rev, Chorus",
+        "popup": "🎛️ Global FX Top Row (All APC40 Channels)\n• E11: Filter Cutoff (CC 74) | E12: Resonance (CC 71)\n• E13: Reverb Space (CC 91) | E14: Chorus Width (CC 93)"
+      },
+      {
+        "label": "Global E15–E18 · Atk, Rel, Vibrato, Pitch",
+        "popup": "🎛️ Global FX Bottom Row\n• E15: Attack Swell (CC 73) | E16: Release Tail (CC 72)\n• E17: Vibrato LFO (CC 1) | E18: Master Pitch (±12 st, center 64)"
+      },
+      {
+        "label": "M8 Row 4 (P32–39) · Reverb & Dub Space",
+        "popup": "🔵 M8 Top Row (P32–P39)\n• P32 Room 35% | P33 Hall 60% | P34 Cathedral 85% | P35 Infinite 100% | P36 Dub | P37 Washout | P38 Cloud | P39 Mute Reverb 0%"
+      },
+      {
+        "label": "M8 Row 3 (P24–31) · Chorus, Vib & Auto-Pan",
+        "popup": "🩵 M8 Row 3 (P24–P31)\n• P24 Chorus 35% | P25 Wide 70% | P26 Max 100% | P27 Vibrato 45% | P28 Vib 100% | P29 Pan 1/4 | P30 Pan 1/8 | P31 Shimmer"
+      },
+      {
+        "label": "M8 Row 2 (P16–23) · Filter, Acid & Wobble",
+        "popup": "🟠 M8 Row 2 (P16–P23)\n• P16 Sub Muffle | P17 Warm 45% | P18 Bright 100% | P19 Acid Peak | P20 Radio Phone | P21 Wobble 1/4 | P22 Wobble 1/8 | P23 Sweep Up"
+      },
+      {
+        "label": "M8 Row 1 (P08–15) · Pitch & Tape Dive",
+        "popup": "🟣 M8 Row 1 (P08–P15)\n• P08 -12st | P09 -7st | P10 -2st | P11 +2st | P12 +7st | P13 +12st | P14 Slow Swell | P15 Tape Dive Stop"
+      },
+      {
+        "label": "M8 Row 0 (P00–07) · Gate, Stutter & Freeze",
+        "popup": "🔴 M8 Bottom Row (P00–P07)\n• P00 Gate 1/4 | P01 Gate 1/8 | P02 Gate 1/16 | P03 Tremolo 1/8 | P04 Stutter 1/8 | P05 Stutter 1/16 | P06 Staccato | P07 Freeze"
+      },
+      {
+        "label": "R8 Latch | B8 Clear | SHIFT+G Reset FX",
+        "popup": "🔒 FX Latch & Reset\n• R8: Toggles M8 Latch (pads stay active on release).\n• B8: Clears M8 FX.\n• Hold SHIFT + Tap G: Resets all Global & M8 FX."
+      }
+    ],
+    "back": "apc_root",
+    "back_label": "🔙 APC40 Menu"
+  },
+  "apc_transport": {
+    "title": "🚀 <b>APC40 — Sessions, Transport &amp; SHIFT</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "PLAY · Synced 7-Ch Loop Play / Pause",
+        "popup": "▶️ PLAY Button (Green LED)\n• Tap: Starts or pauses all recorded APC40 channel loops together in phase."
+      },
+      {
+        "label": "F (STOP ALL CLIPS) · APC40 Panic Only",
+        "popup": "🛑 F Button — APC40 Panic\n• Tap: Stops all APC40 loops, samples & hung notes immediately without touching MPK Mini or Magic Trackpad."
+      },
+      {
+        "label": "RECORD · Audio to Telegram (SHIFT: Save)",
+        "popup": "🎙️ RECORD Button (Red LED)\n• Tap: Starts/stops full FLAC+MP3+MIDI recording (-> Telegram /recordings).\n• Hold SHIFT + Tap RECORD: Saves APC40 session."
+      },
+      {
+        "label": "USER (1–4) & SESSION (1–5) · 20 Slots",
+        "popup": "💾 Multi-User Disk Sessions\n• Tap USER: Cycles User 1–4.\n• Tap SESSION: Loads Session 1–5.\n• Hold SHIFT + Tap SESSION: Saves loops, mix, FX & BPM."
+      },
+      {
+        "label": "Scenes A–E & G · Sub-Banks / Loop Scenes",
+        "popup": "🎬 A–E & Master G\n• Normal: A–E pick first 5 kits/banks (◄► cycle all).\n• Hold SHIFT + Tap A–E: Saves active loop mask.\n• Tap G: Scene Launch mode."
+      },
+      {
+        "label": "E10 BPM | TAP | NUDGE ± | METRONOME | E9",
+        "popup": "⏱ Tempo & Click\n• E10: ±1 BPM (SHIFT: ±5).\n• TAP TEMPO: live BPM | NUDGE ±: ±25ms phase.\n• METRONOME: Ch 15 click | E9: Click vol (SHIFT: Octave)."
+      },
+      {
+        "label": "SHIFT Shortcuts Cheat-Sheet",
+        "popup": "⚡ Hold SHIFT +\n• R1–7: Undo | B1–7: Clear loop | M1–8: Reset ch\n• PAN: Center pans | USER: E1–8 Filter | G: Reset FX\n• SESSION/RECORD: Save session."
+      }
+    ],
+    "back": "apc_root",
+    "back_label": "🔙 APC40 Menu"
+  },
+  "apc_qa": {
+    "title": "📂 <b>APC40 — Custom Samples &amp; Q&amp;A</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Load Custom WAV / MP3 Samples (M1 & M2)",
+        "popup": "📂 Plug & Play Samples\n• Drop .wav/.mp3/.ogg/.flac into midi-to-synth/samples/m1/ or m2/ (Pads 1–80 via BANK). Real-time fader/crossfader scaling & R1/R2 loopable."
+      },
+      {
+        "label": "Playing Simultaneously with MPK & PAD",
+        "popup": "🤝 100% Isolated Channels\n• APC40 uses exclusive Ch 3, 5, 6, 25, 28, 29, 31. Master F9, Crossfader F10, FX & Panic F never interfere with MPK or Trackpad."
+      },
+      {
+        "label": "M8 Channel FX vs E11–E18 Global FX",
+        "popup": "✨ Dual-FX Routing\n• E11–E18 affect all APC40 channels.\n• M8 pads affect ONLY sounding channels (or last touched) and restore E11–E18 on release unless R8 Latch is ON."
+      }
+    ],
+    "back": "apc_root",
+    "back_label": "🔙 APC40 Menu"
+  },
+  "pad_root": {
+    "title": "✨ <b>Apple Magic Trackpad 2</b>",
+    "layout": "2col",
+    "items": [
+      {
+        "label": "🖐️ Gestures & Corners",
+        "goto": "pad_gestures"
+      },
+      {
+        "label": "🎼 Mode 1: Linn (16)",
+        "goto": "pad_linn"
+      },
+      {
+        "label": "🎻 Modes 2–4 (24)",
+        "goto": "pad_modes"
+      },
+      {
+        "label": "🔋 Bluetooth & Q&A",
+        "goto": "pad_qa"
+      },
+      {
+        "label": "📄 PDF Trackpad",
+        "pdf": "pdfs/Manual_Instrucciones_Magic_Trackpad.pdf"
+      }
+    ],
+    "back": "synth_hub",
+    "back_label": "🔙 Synth Hub"
+  },
+  "pad_gestures": {
+    "title": "🖐️ <b>Trackpad — Gestures &amp; Corners</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "98% Surface · X Pitch | Y Filter | Z Press",
+        "popup": "✨ MPE Multi-Touch Surface (Ch 2)\n• X-axis: Note / Continuous Pitch / Stereo Pan\n• Y-axis: Filter Cutoff (CC 74) / Vibrato / Chorus\n• Z Pressure: Dynamic expression (up to 4 voices)."
+      },
+      {
+        "label": "Tap Bottom Corner · ◀ Prev / Next ▶ Sound",
+        "popup": "👆 Single Click Bottom L / R Corner (1 cm²)\n• Tap Left: Previous preset in current mode.\n• Tap Right: Next preset (plays 100ms timbre preview)."
+      },
+      {
+        "label": "Double-Tap Corner · ◀ Prev / Next ▶ Mode",
+        "popup": "👆👆 Double Click Bottom L / R Corner\n• Switches across Modes 1 ↔ 2 ↔ 3 ↔ 4 with marimba chime and percussive Wall Bump at Modes 1 & 4."
+      },
+      {
+        "label": "Hold Bottom Corner (>0.55s) · Vol - / +",
+        "popup": "🔊 Hold Bottom L / R Corner (>0.55s)\n• Hold Left: Volume down (-8/220ms).\n• Hold Right: Volume up (+8/220ms, double wood knock at 0% & 100%)."
+      },
+      {
+        "label": "4-Finger Swipe L / R · Octave (-2 to +2)",
+        "popup": "🖐️ 4-Finger Horizontal Swipe\n• Swipe Left / Right anywhere on glass: Shifts octave across 5 levels (-2 to +2 octaves) with marimba chime."
+      },
+      {
+        "label": "Dual Corner Click (L+R) · 🛑 Pad Panic",
+        "popup": "🛑 Click Both Bottom Corners Together\n• Instant Trackpad Panic: silences all Ch 2 notes & resets pitch/CC without affecting MPK Mini or APC40."
+      }
+    ],
+    "back": "pad_root",
+    "back_label": "🔙 PAD Menu"
+  },
+  "pad_linn": {
+    "title": "🎼 <b>Trackpad — Mode 1: LinnStrument</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "4×8 Fourths Grid · X ±2st | Y Cutoff | 4v",
+        "popup": "🎼 Mode 1 Architecture\n• 4×8 isomorphic grid tuned in fourths (+5st up, +1st right). X: ±2st micro-bend | Y: Filter (CC 74) | Z: Poly pressure (4 voices)."
+      },
+      {
+        "label": "01–04 · Warm Pad, Polysynth, Square, Saw",
+        "popup": "🎹 Mode 1 Presets 1–4\n1. Warm Analog Pad (88)\n2. Polysynth Warmth (89)\n3. Square Lead (80)\n4. Sawtooth Lead (81)"
+      },
+      {
+        "label": "05–08 · Rhodes MK1, DX7, Vibes, Marimba",
+        "popup": "🎹 Mode 1 Presets 5–8\n5. Rhodes MK1 EP (2)\n6. FM DX7 EP (4)\n7. Jazz Vibraphone (11)\n8. Marimba Resonant (12)"
+      },
+      {
+        "label": "09–12 · Nylon Gt, Jazz Gt, Violin, Cello",
+        "popup": "🎻 Mode 1 Presets 9–12\n9. Nylon Spanish Guitar (24)\n10. Jazz Archtop Guitar (26)\n11. Solo Violin (40)\n12. Solo Cello (42)"
+      },
+      {
+        "label": "13–16 · Strings, Voice, Pipe & B3 Organ",
+        "popup": "🎶 Mode 1 Presets 13–16\n13. String Ensemble (48)\n14. Synth Voice Ooh (54)\n15. Church Pipe Organ (19)\n16. Hammond B3 Organ (16)"
+      }
+    ],
+    "back": "pad_root",
+    "back_label": "🔙 PAD Menu"
+  },
+  "pad_modes": {
+    "title": "🎻 <b>Trackpad — Modes 2, 3 &amp; 4 (24)</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Mode 2 · Theremin Fretless Glide (±24 st)",
+        "popup": "🛸 Mode 2 — Theremin Glide\n• Monophonic continuous fretless pitch across 4 octaves (±24 semitones) on X; Filter Cutoff & brightness on Y."
+      },
+      {
+        "label": "↳ Mode 2 Presets (8): Sine, Flute, Cello…",
+        "popup": "🛸 Mode 2 Presets (8)\n1. Sine Lead | 2. Pan Flute | 3. Shakuhachi | 4. Solo Cello | 5. Violin Vibrato | 6. Saw Solo | 7. Space Dark | 8. Calliope"
+      },
+      {
+        "label": "Mode 3 · Kaoss Lead Ribbon (2 Oct + Vib)",
+        "popup": "⚡ Mode 3 — Kaoss Pad Ribbon\n• Fast 2-octave solo ribbon (notes 48–72 + octave) on X; simultaneous Filter Cutoff (CC 74) + Vibrato (CC 1) on Y."
+      },
+      {
+        "label": "↳ Mode 3 Presets (8): Kaoss, 8-Bit, Gt…",
+        "popup": "⚡ Mode 3 Presets (8)\n1. Saw Kaossilator | 2. Square 8-Bit | 3. Bass+Lead | 4. Charang Synth | 5. Overdriven Gt | 6. Distortion Gt | 7. Arcade | 8. Brite"
+      },
+      {
+        "label": "Mode 4 · Vector Morpher Drone (5th + Pan)",
+        "popup": "🌌 Mode 4 — Vector Morpher\n• 2-voice open-fifth (+7st) ambient soundscape. X: continuous harmonic root + stereo pan; Y: Chorus (CC 93) + swell."
+      },
+      {
+        "label": "↳ Mode 4 Presets (8): Pad, Choir, Glass…",
+        "popup": "🌌 Mode 4 Presets (8)\n1. Warm Pad | 2. Polysynth Strings | 3. Space Choir | 4. Bowed Glass | 5. Halo Pad | 6. Cosmic Sweep | 7. Orch Strings | 8. Voice Aah"
+      }
+    ],
+    "back": "pad_root",
+    "back_label": "🔙 PAD Menu"
+  },
+  "pad_qa": {
+    "title": "🔋 <b>Trackpad — Bluetooth &amp; Q&amp;A</b>",
+    "layout": "1col",
+    "items": [
+      {
+        "label": "Bluetooth Auto-Reconnect & Chimes",
+        "popup": "📶 Bluetooth & USB\n• Managed by PAD Synth (magicpad) + PAD BT (bt-trackpad). Plays rising C5–E5–G5 arpeggio on connect, falling G5–E5–C5 on disconnect."
+      },
+      {
+        "label": "1 cm² Corner Deadzones (Zero False Notes)",
+        "popup": "📐 Calibrated Corners\n• Bottom corners (Y>0.90, X<0.09 / X>0.91) never trigger notes when clicking presets, modes, volume or panic."
+      },
+      {
+        "label": "Recording Trackpad MPE in /recordings",
+        "popup": "🎙️ Full MPE Session Recording\n• Starting REC on MPK (CC Bank B Pad 4) or APC40 (RECORD) captures all Ch 2 notes, continuous pitch-bends & CC in FLAC/MP3/MIDI."
+      },
+      {
+        "label": "Save Trackpad Battery via Services",
+        "popup": "🔋 Power Control\n• Open ⚙️ Services in /synth to toggle ✨ PAD Synth or 📶 PAD BT OFF persistently when not using the Trackpad."
+      }
+    ],
+    "back": "pad_root",
+    "back_label": "🔙 PAD Menu"
+  }
+}

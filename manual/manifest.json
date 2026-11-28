@@ -1,0 +1,17 @@
+{
+  "name": "Synth Station Offline Guide",
+  "short_name": "Synth Guide",
+  "description": "Offline interactive button guide & PDFs for Akai MPK Mini MK3, Akai APC40 mkII, and Apple Magic Trackpad 2",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "../favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
